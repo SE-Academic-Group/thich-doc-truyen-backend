@@ -2,6 +2,7 @@ package com.hcmus.group11.novelaggregator.plugin.plugins;
 
 import com.hcmus.group11.novelaggregator.plugin.BaseCrawler;
 import com.hcmus.group11.novelaggregator.type.NovelSearchResult;
+import com.hcmus.group11.novelaggregator.type.ResponseMetadata;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -43,5 +44,25 @@ public class TangThuVien extends BaseCrawler {
         }
 
         return novelSearchResults;
+    }
+
+    @Override
+    protected ResponseMetadata parseSearchMetadata(Document html) {
+        Elements pages = html.select("ul.pagination li a");
+//        Get highest page number
+        Integer maxPage = 1;
+        for (Element page : pages) {
+            String pageNumber = page.text();
+            pageNumber = pageNumber.replaceAll("[^0-9]", "");
+            if (pageNumber.isEmpty()) {
+                continue;
+            }
+            maxPage = Math.max(maxPage, Integer.parseInt(pageNumber));
+        }
+
+        ResponseMetadata responseMetadata = new ResponseMetadata();
+        responseMetadata.addMetadataValue("maxPage", maxPage);
+
+        return responseMetadata;
     }
 }
