@@ -1,14 +1,12 @@
 package com.hcmus.group11.novelaggregator.plugin;
 
 import com.hcmus.group11.novelaggregator.type.NovelSearchResult;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-
 
 import java.util.List;
 
@@ -29,12 +27,9 @@ public abstract class BaseCrawler implements INovelPlugin {
     }
 
     @Override
-    public List<NovelSearchResult> search(String keyword) {
-        keyword = "thần";
-//        B1: Get HTML
-        String searchUrl = buildSearchUrl(keyword);
+    public List<NovelSearchResult> search(String keyword, Integer page) {
+        String searchUrl = buildSearchUrl(keyword, page);
         Document html = getHtml(searchUrl);
-//        B2: Parse HTML
         List<NovelSearchResult> novelSearchResults = parseSearchHTML(html);
         return novelSearchResults;
     }
@@ -48,7 +43,7 @@ public abstract class BaseCrawler implements INovelPlugin {
         }
     }
 
-    protected abstract String buildSearchUrl(String keyword);
+    protected abstract String buildSearchUrl(String keyword, Integer page);
 
     protected abstract List<NovelSearchResult> parseSearchHTML(Document html);
 }

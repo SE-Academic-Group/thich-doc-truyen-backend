@@ -18,8 +18,8 @@ public class MeTruyenChu extends BaseCrawler {
     }
 
     @Override
-    public String buildSearchUrl(String keyword) {
-        return pluginUrl + "/search?q="+ keyword;
+    public String buildSearchUrl(String keyword, Integer page) {
+        return pluginUrl + "/search?q=" + keyword + "&page=" + page;
     }
 
     @Override

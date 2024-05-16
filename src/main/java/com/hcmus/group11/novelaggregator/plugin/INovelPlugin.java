@@ -6,8 +6,10 @@ import java.util.List;
 
 public interface INovelPlugin {
     String getPluginName();
+
     String getPluginUrl();
-    List<NovelSearchResult> search(String keyword);
+
+    List<NovelSearchResult> search(String keyword, Integer page);
 //    NovelDetail searchNovelDetail(String novelTitle);
 //    NovelDetail getNovelDetail(NovelSearchResult novelSearchResult);
 //    ChapterDetail getChapterDetail(NovelDetail novelDetail, int chapterIndex);
