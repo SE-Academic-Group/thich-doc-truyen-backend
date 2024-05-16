@@ -1,6 +1,5 @@
 package com.hcmus.group11.novelaggregator.controller;
 
-import com.hcmus.group11.novelaggregator.plugin.PluginManager;
 import com.hcmus.group11.novelaggregator.service.NovelService;
 import com.hcmus.group11.novelaggregator.type.NovelSearchResult;
 import com.hcmus.group11.novelaggregator.type.PluginMetadata;
@@ -19,14 +18,12 @@ public class NovelController {
         this.novelService = novelService;
     }
 
-    @GetMapping("/search")
-    public List<NovelSearchResult> search(@RequestParam("term") String param) {
-        return novelService.search(param, "tangThuVien");
-    }
-
     @GetMapping("/{pluginName}/search")
-    public List<NovelSearchResult> search(@RequestParam("q") String param, @PathVariable() String pluginName) {
-        return novelService.search(param, pluginName);
+    public List<NovelSearchResult> search(@RequestParam() String q, @RequestParam(required = false) Integer page, @PathVariable() String pluginName) {
+        if (page == null) {
+            page = 1;
+        }
+        return novelService.search(q, page, pluginName);
     }
 
     @GetMapping("/plugin-list")

@@ -18,8 +18,8 @@ public class TangThuVien extends BaseCrawler {
     }
 
     @Override
-    public String buildSearchUrl(String keyword) {
-        return pluginUrl + "/ket-qua-tim-kiem?term="+ keyword;
+    public String buildSearchUrl(String keyword, Integer page) {
+        return pluginUrl + "/ket-qua-tim-kiem?term=" + keyword + "&page=" + page;
     }
 
     @Override
