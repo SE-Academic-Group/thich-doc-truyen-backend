@@ -49,7 +49,24 @@ public class TangThuVien extends BaseCrawler {
 
     @Override
     protected NovelDetail parseNovelDetailHTML(Document html) {
-        return null;
+        String title = html.selectFirst("div.book-info h1").text();
+        String author = html.selectFirst("div.book-info p.tag a.blue").text();
+        String image = html.selectFirst("div.book-img img").attr("src");
+        String url = html.baseUri();
+        String nChapterText = html.selectFirst("a#j-bookCatalogPage").text().replaceAll("[^0-9]", "");
+        Integer nChapter = Integer.parseInt(nChapterText);
+        String description = html.selectFirst("div.book-intro p").text();
+//        Remove all <br> from description
+        description = description.replaceAll("<br>", "");
+
+        Elements genreElements = html.select("div.book-info p.tag a.red");
+        List<String> genres = new ArrayList<>();
+        for (Element genreElement : genreElements) {
+            genres.add(genreElement.text());
+        }
+
+        NovelDetail novelDetail = new NovelDetail(title, author, image, url, nChapter, description, genres, null);
+        return novelDetail;
     }
 
     @Override
