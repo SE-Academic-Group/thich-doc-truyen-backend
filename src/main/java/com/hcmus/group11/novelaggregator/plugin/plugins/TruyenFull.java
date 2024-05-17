@@ -145,6 +145,7 @@ public class TruyenFull extends BaseApi {
     protected String buildNovelDetailUrl( Integer id, String type) {
 
         String result = NOVEL_DETAIL_BASE_URL + id;
+
         if (type != null) {
             result += "/" + type;
         }
@@ -177,5 +178,4 @@ public class TruyenFull extends BaseApi {
 
         RequestAttributeUtil.setAttribute("metadata", metadata);
     }
-
 }

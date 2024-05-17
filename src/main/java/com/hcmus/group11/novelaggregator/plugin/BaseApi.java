@@ -22,7 +22,6 @@ public abstract class BaseApi implements INovelPlugin{
         return pluginUrl;
     }
 
-
     @Override
     public List<ChapterInfo> getChapterList(String url, Integer page) {
         String chapterListUrl = buildChapterListUrlFromNovelDetailUrl(url, page);
@@ -46,6 +45,7 @@ public abstract class BaseApi implements INovelPlugin{
     public List<NovelSearchResult> search(String keyword, Integer page){
         String searchUrl = buildSearchUrl(keyword, page);
         String jsonString = getJsonString(searchUrl);
+
         List<NovelSearchResult> novelSearchResults = getSearchDataFromJsonString(jsonString);
 
         return novelSearchResults;
@@ -75,5 +75,4 @@ public abstract class BaseApi implements INovelPlugin{
     protected abstract String buildChapterListUrlFromNovelDetailUrl(String url, Integer page);
     protected abstract String buildChapterDetailUrl(Integer chapterId);
     protected abstract void addMetaData(Map<String, Optional> map);
-
 }
