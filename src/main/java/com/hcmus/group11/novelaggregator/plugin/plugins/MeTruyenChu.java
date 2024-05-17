@@ -1,9 +1,11 @@
 package com.hcmus.group11.novelaggregator.plugin.plugins;
 
 import com.hcmus.group11.novelaggregator.plugin.BaseCrawler;
+import com.hcmus.group11.novelaggregator.type.ChapterInfo;
 import com.hcmus.group11.novelaggregator.type.NovelDetail;
 import com.hcmus.group11.novelaggregator.type.NovelSearchResult;
 import com.hcmus.group11.novelaggregator.type.ResponseMetadata;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -49,7 +51,26 @@ public class MeTruyenChu extends BaseCrawler {
 
     @Override
     protected NovelDetail parseNovelDetailHTML(Document html) {
-        return null;
+        Elements div = html.select("div.book-info");
+
+        String title = div.select("div.mRightCol h1").text();
+        Elements lis = div.select("div.book-info ul li");
+        String author = lis.get(0).select("a").text();
+        String image = this.pluginUrl + div.select("div.book-info-pic img").attr("src");
+        String nChapterText = lis.get(2).text();
+        String url = html.baseUri();
+        Integer nChapter = Integer.parseInt(nChapterText.replaceAll("[^0-9]", ""));
+        String description = div.select("div.showmore div div").text();
+
+        List<String> genres = new ArrayList<>();
+        Elements li_genres = lis.get(1).select("li.li--genres a");
+        for(Element li_genre : li_genres) {
+            genres.add(li_genre.select("a").text());
+        }
+
+
+
+        return new NovelDetail(title, author, image, url, nChapter, description, genres);
     }
 
     @Override
@@ -70,5 +91,24 @@ public class MeTruyenChu extends BaseCrawler {
         responseMetadata.addMetadataValue("maxPage", maxPage);
 
         return responseMetadata;
+    }
+
+    @Override
+    public List<ChapterInfo> getChapterList(String novelDetailUrl, Integer page) {
+        Document html = getHtml(novelDetailUrl);
+        Elements _a = html.select("div.paging a");
+
+        String storyId = _a.get(1).attr("onclick");
+        storyId = storyId.substring(storyId.indexOf('(') + 1, storyId.indexOf(','));
+        String url = pluginUrl + "/get/listchap/" + storyId + "?page=" + page;
+
+        String json = Jsoup.connect(url).ignoreContentType(true).execute().body();
+        Document chapterListHtml = getHtml(url);
+        System.out.println(chapterListHtml);
+
+        List<ChapterInfo> chapterInfos = new ArrayList<>();
+
+
+        return chapterInfos;
     }
 }

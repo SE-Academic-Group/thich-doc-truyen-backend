@@ -66,7 +66,7 @@ public class TangThuVien extends BaseCrawler {
             genres.add(genreElement.text());
         }
 
-        NovelDetail novelDetail = new NovelDetail(title, author, image, url, nChapter, description, genres, null);
+        NovelDetail novelDetail = new NovelDetail(title, author, image, url, nChapter, description, genres);
         return novelDetail;
     }
 
