@@ -1,6 +1,7 @@
 package com.hcmus.group11.novelaggregator.controller;
 
 import com.hcmus.group11.novelaggregator.service.NovelService;
+import com.hcmus.group11.novelaggregator.type.NovelDetail;
 import com.hcmus.group11.novelaggregator.type.NovelSearchResult;
 import com.hcmus.group11.novelaggregator.type.PluginMetadata;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +25,11 @@ public class NovelController {
             page = 1;
         }
         return novelService.search(q, page, pluginName);
+    }
+
+    @GetMapping("/{pluginName}/novel-detail")
+    public NovelDetail getNovelDetail(@RequestParam() String url, @PathVariable() String pluginName) {
+        return novelService.getNovelDetail(url, pluginName);
     }
 
     @GetMapping("/plugin-list")

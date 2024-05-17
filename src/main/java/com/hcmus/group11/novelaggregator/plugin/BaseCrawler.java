@@ -1,5 +1,6 @@
 package com.hcmus.group11.novelaggregator.plugin;
 
+import com.hcmus.group11.novelaggregator.type.NovelDetail;
 import com.hcmus.group11.novelaggregator.type.NovelSearchResult;
 import com.hcmus.group11.novelaggregator.type.ResponseMetadata;
 import com.hcmus.group11.novelaggregator.util.RequestAttributeUtil;
@@ -40,6 +41,11 @@ public abstract class BaseCrawler implements INovelPlugin {
 
         RequestAttributeUtil.setAttribute("metadata", metadata);
         return novelSearchResults;
+    }
+
+    @Override
+    public NovelDetail getNovelDetail(String url) {
+        return null;
     }
 
     protected Document getHtml(String url) {
