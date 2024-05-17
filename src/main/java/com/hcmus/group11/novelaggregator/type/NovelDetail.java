@@ -12,12 +12,10 @@ import java.util.List;
 public class NovelDetail extends NovelSearchResult {
     private String description;
     private List<String> genres;
-    private List<ChapterInfo> chapters;
 
-    public NovelDetail(String title, String author, String image, String url, Integer nChapter, String description, List<String> genres, List<ChapterInfo> chapters) {
+    public NovelDetail(String title, String author, String image, String url, Integer nChapter, String description, List<String> genres) {
         super(title, author, image, url, nChapter);
         this.description = description;
         this.genres = genres;
-        this.chapters = chapters;
     }
 }
