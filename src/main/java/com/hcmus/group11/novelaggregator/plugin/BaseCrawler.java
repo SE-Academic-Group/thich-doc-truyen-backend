@@ -43,9 +43,10 @@ public abstract class BaseCrawler implements INovelPlugin {
         return novelSearchResults;
     }
 
-    @Override
     public NovelDetail getNovelDetail(String url) {
-        return null;
+        Document html = getHtml(url);
+
+        return parseNovelDetailHTML(html);
     }
 
     protected Document getHtml(String url) {
@@ -61,7 +62,10 @@ public abstract class BaseCrawler implements INovelPlugin {
 
     protected abstract List<NovelSearchResult> parseSearchHTML(Document html);
 
+    protected abstract NovelDetail parseNovelDetailHTML(Document html);
+
     protected ResponseMetadata parseSearchMetadata(Document html) {
         return null;
     }
+
 }
