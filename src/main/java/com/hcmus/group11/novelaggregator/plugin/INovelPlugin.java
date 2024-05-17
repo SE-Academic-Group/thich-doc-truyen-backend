@@ -2,6 +2,7 @@ package com.hcmus.group11.novelaggregator.plugin;
 
 import com.hcmus.group11.novelaggregator.type.NovelSearchResult;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface INovelPlugin {
