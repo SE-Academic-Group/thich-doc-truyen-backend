@@ -1,5 +1,6 @@
 package com.hcmus.group11.novelaggregator.plugin;
 
+import com.hcmus.group11.novelaggregator.type.ChapterInfo;
 import com.hcmus.group11.novelaggregator.type.NovelDetail;
 import com.hcmus.group11.novelaggregator.type.NovelSearchResult;
 import com.hcmus.group11.novelaggregator.type.ResponseMetadata;
@@ -43,8 +44,13 @@ public abstract class BaseCrawler implements INovelPlugin {
         return novelSearchResults;
     }
 
-    @Override
     public NovelDetail getNovelDetail(String url) {
+        Document html = getHtml(url);
+
+        return parseNovelDetailHTML(html);
+    }
+
+    public List<ChapterInfo> getChapterList(String novelDetailUrl, Integer page) {
         return null;
     }
 
@@ -60,6 +66,8 @@ public abstract class BaseCrawler implements INovelPlugin {
     protected abstract String buildSearchUrl(String keyword, Integer page);
 
     protected abstract List<NovelSearchResult> parseSearchHTML(Document html);
+
+    protected abstract NovelDetail parseNovelDetailHTML(Document html);
 
     protected ResponseMetadata parseSearchMetadata(Document html) {
         return null;

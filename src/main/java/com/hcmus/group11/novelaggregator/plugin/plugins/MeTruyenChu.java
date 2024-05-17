@@ -1,6 +1,7 @@
 package com.hcmus.group11.novelaggregator.plugin.plugins;
 
 import com.hcmus.group11.novelaggregator.plugin.BaseCrawler;
+import com.hcmus.group11.novelaggregator.type.NovelDetail;
 import com.hcmus.group11.novelaggregator.type.NovelSearchResult;
 import com.hcmus.group11.novelaggregator.type.ResponseMetadata;
 import org.jsoup.nodes.Document;
@@ -44,6 +45,11 @@ public class MeTruyenChu extends BaseCrawler {
         }
 
         return novelSearchResults;
+    }
+
+    @Override
+    protected NovelDetail parseNovelDetailHTML(Document html) {
+        return null;
     }
 
     @Override

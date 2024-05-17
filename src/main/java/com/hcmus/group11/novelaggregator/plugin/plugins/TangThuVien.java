@@ -1,8 +1,11 @@
 package com.hcmus.group11.novelaggregator.plugin.plugins;
 
 import com.hcmus.group11.novelaggregator.plugin.BaseCrawler;
+import com.hcmus.group11.novelaggregator.type.ChapterInfo;
+import com.hcmus.group11.novelaggregator.type.NovelDetail;
 import com.hcmus.group11.novelaggregator.type.NovelSearchResult;
 import com.hcmus.group11.novelaggregator.type.ResponseMetadata;
+import com.hcmus.group11.novelaggregator.util.RequestAttributeUtil;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -29,7 +32,6 @@ public class TangThuVien extends BaseCrawler {
 
         //        Get ul child from div.book-img-text
         Elements lis = html.select("div.book-img-text ul li");
-        System.out.println(lis);
         for (Element li : lis) {
             // Extract information
             String title = li.selectFirst("div.book-mid-info h4 a").text();
@@ -44,6 +46,28 @@ public class TangThuVien extends BaseCrawler {
         }
 
         return novelSearchResults;
+    }
+
+    @Override
+    protected NovelDetail parseNovelDetailHTML(Document html) {
+        String title = html.selectFirst("div.book-info h1").text();
+        String author = html.selectFirst("div.book-info p.tag a.blue").text();
+        String image = html.selectFirst("div.book-img img").attr("src");
+        String url = html.baseUri();
+        String nChapterText = html.selectFirst("a#j-bookCatalogPage").text().replaceAll("[^0-9]", "");
+        Integer nChapter = Integer.parseInt(nChapterText);
+        String description = html.selectFirst("div.book-intro p").text();
+//        Remove all <br> from description
+        description = description.replaceAll("<br>", "");
+
+        Elements genreElements = html.select("div.book-info p.tag a.red");
+        List<String> genres = new ArrayList<>();
+        for (Element genreElement : genreElements) {
+            genres.add(genreElement.text());
+        }
+
+        NovelDetail novelDetail = new NovelDetail(title, author, image, url, nChapter, description, genres);
+        return novelDetail;
     }
 
     @Override
@@ -63,6 +87,74 @@ public class TangThuVien extends BaseCrawler {
         ResponseMetadata responseMetadata = new ResponseMetadata();
         responseMetadata.addMetadataValue("maxPage", maxPage);
 
+        return responseMetadata;
+    }
+
+    @Override
+    public List<ChapterInfo> getChapterList(String novelDetailUrl, Integer page) {
+        Document html = getHtml(novelDetailUrl);
+        String storyId = html.selectFirst("input#story_id_hidden").attr("value");
+        String url = pluginUrl + "/doc-truyen/page/" + storyId + "?page=" + page + "&limit=75&web=1";
+
+        Document chapterListHtml = getHtml(url);
+
+        List<ChapterInfo> chapterInfos = parseChapterListHTML(chapterListHtml);
+        ResponseMetadata metadata = parseChapterListMetadata(chapterListHtml);
+        metadata.addMetadataValue("currentPage", page);
+        metadata.addMetadataValue("pluginName", pluginName);
+
+        RequestAttributeUtil.setAttribute("metadata", metadata);
+
+        return chapterInfos;
+    }
+
+    private List<ChapterInfo> parseChapterListHTML(Document html) {
+        List<ChapterInfo> chapterInfos = new ArrayList<>();
+        Elements chapterElements = html.select("ul.cf li");
+        for (Element chapterElement : chapterElements) {
+            Element chapterTitleElement = chapterElement.selectFirst("a");
+
+            // If chapterTitleElement is null => this "li" is the Divider chap => no url, just title and span
+            if (chapterTitleElement == null) {
+                ChapterInfo chapterInfo = new ChapterInfo();
+                chapterInfo.setTitle(chapterElement.selectFirst("span").text());
+                chapterInfos.add(chapterInfo);
+                continue;
+            }
+
+
+            String title = chapterElement.selectFirst("a").text();
+            String url = chapterElement.selectFirst("a").attr("href");
+//            Title format is "Chương {chapterIndex} : {chapterTitle}"
+            String chapterIndexText = title.split(":")[0].replaceAll("[^0-9]", "");
+            Integer chapterIndex = Integer.parseInt(chapterIndexText);
+            title = title.split(":")[1].trim();
+
+            ChapterInfo chapterInfo = new ChapterInfo(title, url, chapterIndex);
+            chapterInfos.add(chapterInfo);
+        }
+
+        return chapterInfos;
+    }
+
+    private ResponseMetadata parseChapterListMetadata(Document html) {
+        Elements pages = html.select("ul.pagination li a");
+//        Get page array
+        List<Integer> pageArray = new ArrayList<>();
+        Integer maxPage = 1;
+        for (Element page : pages) {
+            String pageNumber = page.text();
+            pageNumber = pageNumber.replaceAll("[^0-9]", "");
+            if (pageNumber.isEmpty()) {
+                continue;
+            }
+            pageArray.add(Integer.parseInt(pageNumber));
+            maxPage = Math.max(maxPage, Integer.parseInt(pageNumber));
+        }
+
+        ResponseMetadata responseMetadata = new ResponseMetadata();
+        responseMetadata.addMetadataValue("pageArray", pageArray);
+        responseMetadata.addMetadataValue("maxPage", maxPage);
         return responseMetadata;
     }
 }
