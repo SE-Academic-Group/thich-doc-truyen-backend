@@ -1,6 +1,7 @@
 package com.hcmus.group11.novelaggregator.plugin.plugins;
 
 import com.hcmus.group11.novelaggregator.plugin.BaseCrawler;
+import com.hcmus.group11.novelaggregator.type.ChapterInfo;
 import com.hcmus.group11.novelaggregator.type.NovelDetail;
 import com.hcmus.group11.novelaggregator.type.NovelSearchResult;
 import com.hcmus.group11.novelaggregator.type.ResponseMetadata;
@@ -87,5 +88,21 @@ public class TangThuVien extends BaseCrawler {
         responseMetadata.addMetadataValue("maxPage", maxPage);
 
         return responseMetadata;
+    }
+
+    @Override
+    public List<ChapterInfo> getChapterList(String novelDetailUrl, Integer page) {
+        Document html = getHtml(novelDetailUrl);
+        String storyId = html.selectFirst("input#story_id_hidden").attr("value");
+        String url = pluginUrl + "/doc-truyen/page/" + storyId + "?page=" + page + "&limit=75&web=1";
+
+        Document chapterListHtml = getHtml(url);
+        
+        System.out.println(chapterListHtml);
+
+        List<ChapterInfo> chapterInfos = new ArrayList<>();
+
+
+        return chapterInfos;
     }
 }

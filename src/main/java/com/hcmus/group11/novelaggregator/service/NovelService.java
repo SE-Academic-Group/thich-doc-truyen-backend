@@ -2,6 +2,7 @@ package com.hcmus.group11.novelaggregator.service;
 
 import com.hcmus.group11.novelaggregator.plugin.INovelPlugin;
 import com.hcmus.group11.novelaggregator.plugin.PluginManager;
+import com.hcmus.group11.novelaggregator.type.ChapterInfo;
 import com.hcmus.group11.novelaggregator.type.NovelDetail;
 import com.hcmus.group11.novelaggregator.type.NovelSearchResult;
 import com.hcmus.group11.novelaggregator.type.PluginMetadata;
@@ -25,6 +26,11 @@ public class NovelService {
     public NovelDetail getNovelDetail(String url, String pluginName) {
         INovelPlugin plugin = pluginManager.getPlugin(pluginName);
         return plugin.getNovelDetail(url);
+    }
+
+    public List<ChapterInfo> getChapterList(String url, Integer page, String pluginName) {
+        INovelPlugin plugin = pluginManager.getPlugin(pluginName);
+        return plugin.getChapterList(url, page);
     }
 
     public List<PluginMetadata> getPluginList() {
