@@ -6,19 +6,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
-@Schema(description = "Information of a chapter")
-public class ChapterInfo {
+@NoArgsConstructor
+@AllArgsConstructor
+@Schema(description = "Details of a chapter")
+public class ChapterDetail {
 
     @Schema(description = "Title of the chapter", example = "Chapter 1: ABC")
     private String title;
 
-    @Schema(description = "URL of the chapter", example = "http://example.com/chapter/1")
-    private String url;
-
-    @Schema(description = "Index of the chapter", example = "1")
-    private Integer index;
+    @Schema(description = "Content of the chapter", example = "This is the content of the chapter")
+    private String content;
 }
