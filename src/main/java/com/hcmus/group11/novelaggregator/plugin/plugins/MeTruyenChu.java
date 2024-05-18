@@ -1,10 +1,13 @@
 package com.hcmus.group11.novelaggregator.plugin.plugins;
 
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.hcmus.group11.novelaggregator.plugin.BaseCrawler;
 import com.hcmus.group11.novelaggregator.type.ChapterInfo;
 import com.hcmus.group11.novelaggregator.type.NovelDetail;
 import com.hcmus.group11.novelaggregator.type.NovelSearchResult;
 import com.hcmus.group11.novelaggregator.type.ResponseMetadata;
+import com.hcmus.group11.novelaggregator.util.RequestAttributeUtil;
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -102,13 +105,78 @@ public class MeTruyenChu extends BaseCrawler {
         storyId = storyId.substring(storyId.indexOf('(') + 1, storyId.indexOf(','));
         String url = pluginUrl + "/get/listchap/" + storyId + "?page=" + page;
 
-        String json = Jsoup.connect(url).ignoreContentType(true).execute().body();
-        Document chapterListHtml = getHtml(url);
-        System.out.println(chapterListHtml);
+        try{
+            String json = Jsoup.connect(url).ignoreContentType(true).execute().body();
+            JSONObject jsonObject = new JSONObject(json);
 
+            Document chapterListHtml = Jsoup.parse(jsonObject.getString("data"));
+
+            List<ChapterInfo> chapterInfos = parseChapterListHTML(chapterListHtml);
+            ResponseMetadata metadata = parseChapterListMetadata(chapterListHtml);
+            metadata.addMetadataValue("currentPage", page);
+            metadata.addMetadataValue("pluginName", pluginName);
+
+            RequestAttributeUtil.setAttribute("metadata", metadata);
+
+            return chapterInfos;
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+    private List<ChapterInfo> parseChapterListHTML(Document html) {
         List<ChapterInfo> chapterInfos = new ArrayList<>();
+        Elements chapterElements = html.select("div ul li");
+        for (Element chapterElement : chapterElements) {
+            Element chapterTitleElement = chapterElement.selectFirst("a");
 
+            // If chapterTitleElement is null => this "li" is the Divider chap => no url, just title and span
+            if (chapterTitleElement == null) {
+                ChapterInfo chapterInfo = new ChapterInfo();
+                chapterInfo.setTitle(chapterElement.selectFirst("span").text());
+                chapterInfos.add(chapterInfo);
+                continue;
+            }
+
+            String title = chapterElement.selectFirst("a").text();
+            String url = pluginUrl + chapterElement.selectFirst("a").attr("href");
+//            Title format is "Chương {chapterIndex} : {chapterTitle}"
+            String chapterIndexText = title.split(":")[0].replaceAll("[^0-9]", "");
+            Integer chapterIndex = Integer.parseInt(chapterIndexText);
+            title = title.split(":")[1].trim();
+
+            ChapterInfo chapterInfo = new ChapterInfo(title, url, chapterIndex);
+            chapterInfos.add(chapterInfo);
+        }
 
         return chapterInfos;
+    }
+    private ResponseMetadata parseChapterListMetadata(Document html) {
+        ResponseMetadata responseMetadata = new ResponseMetadata();
+        Integer maxPage = null;
+        List<Integer> pageArray = null;
+
+
+        Elements pages = html.select("div.paging a");
+        Element onclickAttr = pages.last();
+        System.out.println(onclickAttr);
+        if(onclickAttr != null) {
+            String lastPage = onclickAttr.attr("onclick");
+            if(!lastPage.isEmpty()) {
+                lastPage = lastPage.substring(lastPage.indexOf(',') + 1, lastPage.indexOf(')'));
+            }else{
+                lastPage = onclickAttr.text();
+            }
+            maxPage = (Integer.parseInt(lastPage));
+            pageArray = new ArrayList<>();
+
+            for(int i = 1; i <= maxPage; i++) {
+                pageArray.add(i);
+            }
+        }
+        responseMetadata.addMetadataValue("pageArray", pageArray);
+        responseMetadata.addMetadataValue("maxPage", maxPage);
+        return responseMetadata;
     }
 }
