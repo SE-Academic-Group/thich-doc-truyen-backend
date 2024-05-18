@@ -1,5 +1,6 @@
 package com.hcmus.group11.novelaggregator.plugin;
 
+import com.hcmus.group11.novelaggregator.type.ChapterDetail;
 import com.hcmus.group11.novelaggregator.type.ChapterInfo;
 import com.hcmus.group11.novelaggregator.type.NovelDetail;
 import com.hcmus.group11.novelaggregator.type.NovelSearchResult;
@@ -20,6 +21,15 @@ public abstract class BaseApi implements INovelPlugin{
 
     public String getPluginUrl() {
         return pluginUrl;
+    }
+
+    @Override
+    public ChapterDetail getChapterDetail(String url) {
+        String jsonChapterDetailString = getJsonString(url);
+
+        ChapterDetail chapterDetail = getChapterDetailFromJsonString(jsonChapterDetailString);
+
+        return chapterDetail;
     }
 
     @Override
@@ -67,6 +77,7 @@ public abstract class BaseApi implements INovelPlugin{
         }
     }
 
+    protected abstract ChapterDetail getChapterDetailFromJsonString(String jsonChapterDetail);
     protected abstract List<ChapterInfo> getChapterListFromJsonString(String jsonChapterList);
     protected abstract NovelDetail getNovelDetailFromJsonString(String jsonDetail);
     protected abstract List<NovelSearchResult> getSearchDataFromJsonString(String jsonString);

@@ -1,9 +1,6 @@
 package com.hcmus.group11.novelaggregator.plugin;
 
-import com.hcmus.group11.novelaggregator.type.ChapterInfo;
-import com.hcmus.group11.novelaggregator.type.NovelDetail;
-import com.hcmus.group11.novelaggregator.type.NovelSearchResult;
-import com.hcmus.group11.novelaggregator.type.ResponseMetadata;
+import com.hcmus.group11.novelaggregator.type.*;
 import com.hcmus.group11.novelaggregator.util.RequestAttributeUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,6 +25,11 @@ public abstract class BaseCrawler implements INovelPlugin {
 
     public String getPluginUrl() {
         return pluginUrl;
+    }
+
+    @Override
+    public ChapterDetail getChapterDetail(String url) {
+        return null;
     }
 
     @Override

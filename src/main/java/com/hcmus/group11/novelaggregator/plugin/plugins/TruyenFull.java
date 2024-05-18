@@ -3,10 +3,7 @@ package com.hcmus.group11.novelaggregator.plugin.plugins;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hcmus.group11.novelaggregator.plugin.BaseApi;
-import com.hcmus.group11.novelaggregator.type.ChapterInfo;
-import com.hcmus.group11.novelaggregator.type.NovelDetail;
-import com.hcmus.group11.novelaggregator.type.NovelSearchResult;
-import com.hcmus.group11.novelaggregator.type.ResponseMetadata;
+import com.hcmus.group11.novelaggregator.type.*;
 import com.hcmus.group11.novelaggregator.util.RequestAttributeUtil;
 import org.springframework.stereotype.Component;
 import java.util.Optional;
@@ -25,6 +22,45 @@ public class TruyenFull extends BaseApi {
     public final String SEARCH_URL = BASE_URL + "/tim-kiem?title={{keyword}}&page={{page}}";
     public final String NOVEL_DETAIL_BASE_URL = BASE_URL+ "/story/detail/";
     public final String CHAPTER_DETAIL_BASE_URL = BASE_URL + "/chapter/detail/";
+
+    @Override
+    protected ChapterDetail getChapterDetailFromJsonString(String jsonChapterDetail) {
+        ChapterDetail chapterDetail = new ChapterDetail();
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            Map<String, Object> jsonMap = objectMapper.readValue(jsonChapterDetail, Map.class);
+            Map<String, Object> data = (Map<String, Object>) jsonMap.get("data");
+
+            chapterDetail.setTitle((String) data.get("chapter_name"));
+            chapterDetail.setContent((String) data.get("content"));
+
+            Integer nextChapterId = (Integer) data.get("chapter_next");
+            Integer prevChapterId = (Integer) data.get("chapter_prev");
+
+            Map<String, Optional> map = new HashMap<>();
+
+            String nextChapterDetailUrl = null;
+            if(nextChapterId != null){
+                nextChapterDetailUrl = buildChapterDetailUrl(nextChapterId);
+            }
+
+            String prevChapterDetailUrl = null;
+            if(prevChapterId != null){
+                prevChapterDetailUrl = buildChapterDetailUrl(prevChapterId);
+            }
+
+            map.put("nextChapter", Optional.ofNullable(nextChapterDetailUrl));
+
+            map.put("prevChapter", Optional.ofNullable(prevChapterDetailUrl));
+
+            addMetaData(map);
+
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        return chapterDetail;
+    }
 
     @Override
     protected List<ChapterInfo> getChapterListFromJsonString(String jsonChapterList) {

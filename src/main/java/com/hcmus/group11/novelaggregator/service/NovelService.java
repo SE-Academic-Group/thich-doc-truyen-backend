@@ -2,10 +2,7 @@ package com.hcmus.group11.novelaggregator.service;
 
 import com.hcmus.group11.novelaggregator.plugin.INovelPlugin;
 import com.hcmus.group11.novelaggregator.plugin.PluginManager;
-import com.hcmus.group11.novelaggregator.type.ChapterInfo;
-import com.hcmus.group11.novelaggregator.type.NovelDetail;
-import com.hcmus.group11.novelaggregator.type.NovelSearchResult;
-import com.hcmus.group11.novelaggregator.type.PluginMetadata;
+import com.hcmus.group11.novelaggregator.type.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,5 +32,10 @@ public class NovelService {
 
     public List<PluginMetadata> getPluginList() {
         return pluginManager.getPluginMetadataList();
+    }
+
+    public ChapterDetail getChapterDetail(String url, String pluginName) {
+        INovelPlugin plugin = pluginManager.getPlugin(pluginName);
+        return plugin.getChapterDetail(url);
     }
 }
