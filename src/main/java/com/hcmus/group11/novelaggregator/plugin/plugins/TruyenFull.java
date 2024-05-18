@@ -34,6 +34,9 @@ public class TruyenFull extends BaseApi {
             chapterDetail.setTitle((String) data.get("chapter_name"));
             chapterDetail.setContent((String) data.get("content"));
 
+            Integer id = (Integer) data.get("chapter_id");
+            chapterDetail.setUrl(buildChapterDetailUrl(id));
+
             Integer nextChapterId = (Integer) data.get("chapter_next");
             Integer prevChapterId = (Integer) data.get("chapter_prev");
 
