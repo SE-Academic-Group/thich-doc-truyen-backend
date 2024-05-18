@@ -38,7 +38,7 @@ public class NovelController {
     @GetMapping("/{pluginName}/search")
     public List<NovelSearchResult> search(@RequestParam() String q, @RequestParam(required = false) Integer page, @PathVariable() String pluginName) {
         if (page == null) {
-            page = 0;
+            page = 1;
         }
         return novelService.search(q, page, pluginName);
     }
