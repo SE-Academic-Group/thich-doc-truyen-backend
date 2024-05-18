@@ -21,4 +21,7 @@ public class ChapterDetail {
 
     @Schema(description = "Content of the chapter", example = "This is the content of the chapter")
     private String content;
+
+    @Schema(description = "URL of the chapter", example = "http://example.com/novel/chapter1")
+    private String url;
 }

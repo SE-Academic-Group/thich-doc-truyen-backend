@@ -1,10 +1,7 @@
 package com.hcmus.group11.novelaggregator.plugin.plugins;
 
 import com.hcmus.group11.novelaggregator.plugin.BaseCrawler;
-import com.hcmus.group11.novelaggregator.type.ChapterInfo;
-import com.hcmus.group11.novelaggregator.type.NovelDetail;
-import com.hcmus.group11.novelaggregator.type.NovelSearchResult;
-import com.hcmus.group11.novelaggregator.type.ResponseMetadata;
+import com.hcmus.group11.novelaggregator.type.*;
 import com.hcmus.group11.novelaggregator.util.RequestAttributeUtil;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -57,8 +54,8 @@ public class TangThuVien extends BaseCrawler {
         String nChapterText = html.selectFirst("a#j-bookCatalogPage").text().replaceAll("[^0-9]", "");
         Integer nChapter = Integer.parseInt(nChapterText);
         String description = html.selectFirst("div.book-intro p").text();
-//        Remove all <br> from description
-        description = description.replaceAll("<br>", "");
+//        Remove all <br> from description with new line
+        description = description.replaceAll("<br>", "\n");
 
         Elements genreElements = html.select("div.book-info p.tag a.red");
         List<String> genres = new ArrayList<>();
@@ -88,6 +85,18 @@ public class TangThuVien extends BaseCrawler {
         responseMetadata.addMetadataValue("maxPage", maxPage);
 
         return responseMetadata;
+    }
+
+    @Override
+    protected ChapterDetail parseChapterDetailHTML(Document html) {
+        String title = html.selectFirst("h2").text();
+//        Replace all nbsp with space
+        title = title.replaceAll("\u00A0", " ");
+        String content = html.selectFirst(".box-chap").text();
+        String url = html.baseUri();
+
+        ChapterDetail chapterDetail = new ChapterDetail(title, content, url);
+        return chapterDetail;
     }
 
     @Override
