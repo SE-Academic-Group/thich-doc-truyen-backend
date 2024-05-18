@@ -19,20 +19,6 @@ public abstract class BaseCrawler implements INovelPlugin {
     protected String pluginName;
     protected String pluginUrl;
 
-    public String getPluginName() {
-        return pluginName;
-    }
-
-    public String getPluginUrl() {
-        return pluginUrl;
-    }
-
-    @Override
-    public ChapterDetail getChapterDetail(String url) {
-        return null;
-    }
-
-    @Override
     public List<NovelSearchResult> search(String keyword, Integer page) {
         String searchUrl = buildSearchUrl(keyword, page);
         Document html = getHtml(searchUrl);
@@ -56,6 +42,11 @@ public abstract class BaseCrawler implements INovelPlugin {
         return null;
     }
 
+    public ChapterDetail getChapterDetail(String url) {
+        Document html = getHtml(url);
+        return parseChapterDetailHTML(html);
+    }
+
     protected Document getHtml(String url) {
         try {
             return Jsoup.connect(url).get();
@@ -74,4 +65,6 @@ public abstract class BaseCrawler implements INovelPlugin {
     protected ResponseMetadata parseSearchMetadata(Document html) {
         return null;
     }
+
+    protected abstract ChapterDetail parseChapterDetailHTML(Document html);
 }

@@ -1,6 +1,7 @@
 package com.hcmus.group11.novelaggregator.plugin.plugins;
 
 import com.hcmus.group11.novelaggregator.plugin.BaseCrawler;
+import com.hcmus.group11.novelaggregator.type.ChapterDetail;
 import com.hcmus.group11.novelaggregator.type.NovelDetail;
 import com.hcmus.group11.novelaggregator.type.NovelSearchResult;
 import com.hcmus.group11.novelaggregator.type.ResponseMetadata;
@@ -70,5 +71,10 @@ public class MeTruyenChu extends BaseCrawler {
         responseMetadata.addMetadataValue("maxPage", maxPage);
 
         return responseMetadata;
+    }
+
+    @Override
+    protected ChapterDetail parseChapterDetailHTML(Document html) {
+        return null;
     }
 }
