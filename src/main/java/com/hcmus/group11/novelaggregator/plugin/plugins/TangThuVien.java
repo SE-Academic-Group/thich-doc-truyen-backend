@@ -95,7 +95,7 @@ public class TangThuVien extends BaseCrawler {
         String content = html.selectFirst(".box-chap").text();
         String url = html.baseUri();
 
-        ChapterDetail chapterDetail = new ChapterDetail(title, content, url);
+        ChapterDetail chapterDetail = new ChapterDetail(title, url, content);
         return chapterDetail;
     }
 
