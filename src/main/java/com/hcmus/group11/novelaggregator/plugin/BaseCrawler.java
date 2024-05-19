@@ -38,10 +38,6 @@ public abstract class BaseCrawler implements INovelPlugin {
         return parseNovelDetailHTML(html);
     }
 
-    public List<ChapterInfo> getChapterList(String novelDetailUrl, Integer page) {
-        return null;
-    }
-
     public ChapterDetail getChapterDetail(String url) {
         Document html = getHtml(url);
         return parseChapterDetailHTML(html);

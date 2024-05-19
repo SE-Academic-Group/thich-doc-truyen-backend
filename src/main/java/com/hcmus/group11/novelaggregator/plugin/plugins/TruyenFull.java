@@ -52,9 +52,9 @@ public class TruyenFull extends BaseApi {
                 prevChapterDetailUrl = buildChapterDetailUrl(prevChapterId);
             }
 
-            map.put("nextChapter", Optional.ofNullable(nextChapterDetailUrl));
+            map.put("nextPage", Optional.ofNullable(nextChapterDetailUrl));
 
-            map.put("prevChapter", Optional.ofNullable(prevChapterDetailUrl));
+            map.put("prevPage", Optional.ofNullable(prevChapterDetailUrl));
 
             addMetaData(map);
 
@@ -80,8 +80,8 @@ public class TruyenFull extends BaseApi {
             Integer perPage = (Integer) pagination.get("per_page");
             Integer maxPage = (Integer) pagination.get("total_pages");
             Integer currentPage = (Integer) pagination.get("current_page");
-            String nextPageUrl = (String) links.get("next");
-            String prevPageUrl = (String) links.get("previous");
+//            String nextPageUrl = (String) links.get("next");
+//            String prevPageUrl = (String) links.get("previous");
 
             Integer startId = (currentPage - 1) * perPage + 1;
             for (Map<String, Object> data : dataList) {
@@ -96,8 +96,8 @@ public class TruyenFull extends BaseApi {
             Map<String, Optional> map = new HashMap<>();
             map.put("maxPage", Optional.ofNullable(maxPage));
             map.put("currentPage", Optional.ofNullable(currentPage));
-            map.put("prevPageUrl", Optional.ofNullable(prevPageUrl));
-            map.put("nextPageUrl", Optional.ofNullable(nextPageUrl));
+//            map.put("prevPageUrl", Optional.ofNullable(prevPageUrl));
+//            map.put("nextPageUrl", Optional.ofNullable(nextPageUrl));
 
             addMetaData(map);
 

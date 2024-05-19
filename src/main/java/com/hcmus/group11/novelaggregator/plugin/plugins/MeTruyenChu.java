@@ -1,10 +1,7 @@
 package com.hcmus.group11.novelaggregator.plugin.plugins;
 
 import com.hcmus.group11.novelaggregator.plugin.BaseCrawler;
-import com.hcmus.group11.novelaggregator.type.ChapterDetail;
-import com.hcmus.group11.novelaggregator.type.NovelDetail;
-import com.hcmus.group11.novelaggregator.type.NovelSearchResult;
-import com.hcmus.group11.novelaggregator.type.ResponseMetadata;
+import com.hcmus.group11.novelaggregator.type.*;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -76,5 +73,10 @@ public class MeTruyenChu extends BaseCrawler {
     @Override
     protected ChapterDetail parseChapterDetailHTML(Document html) {
         return null;
+    }
+
+    @Override
+    public List<ChapterInfo> getChapterList(String novelDetailUrl, Integer page) {
+        return List.of();
     }
 }
