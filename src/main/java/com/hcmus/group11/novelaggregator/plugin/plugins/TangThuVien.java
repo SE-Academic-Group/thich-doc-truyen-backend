@@ -99,7 +99,27 @@ public class TangThuVien extends BaseCrawler {
         String content = html.selectFirst(".box-chap").text();
         String url = html.baseUri();
 
+        String prevPage, nextPage;
+        // Get current id from url
+        String currentIdStr = url.substring(url.lastIndexOf("-") + 1);
+        Integer currentId = Integer.parseInt(currentIdStr);
+        // Get prevPage and nextPage
+        if (currentId == 1) {
+            prevPage = null;
+        } else {
+            prevPage = url.substring(0, url.lastIndexOf("-") + 1) + (currentId - 1);
+        }
+
+        // Check if this is the last chapter
+        nextPage = null;
+
         ChapterDetail chapterDetail = new ChapterDetail(title, url, content);
+        ResponseMetadata metadata = new ResponseMetadata();
+        metadata.addMetadataValue("prevPage", prevPage);
+        metadata.addMetadataValue("nextPage", nextPage);
+        metadata.addMetadataValue("pluginName", pluginName);
+        RequestAttributeUtil.setAttribute("metadata", metadata);
+
         return chapterDetail;
     }
 
@@ -114,7 +134,7 @@ public class TangThuVien extends BaseCrawler {
 
         List<ChapterInfo> chapterInfos = parseChapterListHTML(chapterListHtml);
         ResponseMetadata metadata = parseChapterListMetadata(chapterListHtml);
-        metadata.addMetadataValue("currentPage", page);
+        metadata.addMetadataValue("currentPage", page + 1);
         metadata.addMetadataValue("pluginName", pluginName);
 
         RequestAttributeUtil.setAttribute("metadata", metadata);
