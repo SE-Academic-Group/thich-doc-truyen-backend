@@ -101,6 +101,7 @@ public class TangThuVien extends BaseCrawler {
 
     @Override
     public List<ChapterInfo> getChapterList(String novelDetailUrl, Integer page) {
+        page = Math.max(page - 1, 0);
         Document html = getHtml(novelDetailUrl);
         String storyId = html.selectFirst("input#story_id_hidden").attr("value");
         String url = pluginUrl + "/doc-truyen/page/" + storyId + "?page=" + page + "&limit=75&web=1";
