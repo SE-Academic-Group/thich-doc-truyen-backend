@@ -69,10 +69,14 @@ public class TangThuVien extends BaseCrawler {
 
     @Override
     protected ResponseMetadata parseSearchMetadata(Document html) {
-        Elements pages = html.select("ul.pagination li a");
+        Elements pages = html.select("ul.pagination li");
 //        Get highest page number
         Integer maxPage = 1;
         for (Element page : pages) {
+            Element pageElement = page.selectFirst("a") == null ? page.selectFirst("span") : page.selectFirst("a");
+            if (pageElement == null) {
+                continue;
+            }
             String pageNumber = page.text();
             pageNumber = pageNumber.replaceAll("[^0-9]", "");
             if (pageNumber.isEmpty()) {
