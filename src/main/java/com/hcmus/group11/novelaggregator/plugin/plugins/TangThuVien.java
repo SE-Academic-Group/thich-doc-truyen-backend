@@ -109,9 +109,8 @@ public class TangThuVien extends BaseCrawler {
         } else {
             prevPage = url.substring(0, url.lastIndexOf("-") + 1) + (currentId - 1);
         }
+        nextPage = url.substring(0, url.lastIndexOf("-") + 1) + (currentId + 1);
 
-        // Check if this is the last chapter
-        nextPage = null;
 
         ChapterDetail chapterDetail = new ChapterDetail(title, url, content);
         ResponseMetadata metadata = new ResponseMetadata();
