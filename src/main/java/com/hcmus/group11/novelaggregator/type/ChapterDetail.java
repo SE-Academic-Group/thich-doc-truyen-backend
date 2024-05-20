@@ -13,7 +13,10 @@ import lombok.Setter;
 @Schema(description = "Details of a chapter")
 public class ChapterDetail {
 
-    @Schema(description = "Title of the chapter", example = "Chapter 1: ABC")
+    @Schema(description = "Title of the novel", example = "ABC Novel")
+    private String novelTitle;
+
+    @Schema(description = "Title of the chapter", example = "Chapter 1: ABCXYZ")
     private String title;
 
     @Schema(description = "URL of the chapter detail", example = "http://example.com/chapter/1")

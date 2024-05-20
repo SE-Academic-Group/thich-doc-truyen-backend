@@ -59,9 +59,13 @@ public class ThichTruyen extends BaseCrawler {
         String nChapterText = html.selectFirst("p.story-intro-chapper").text().replaceAll("[^0-9]", "");
         Integer nChapter = Integer.parseInt(nChapterText);
         String description = html.selectFirst("div#tab-over div.tab-text p").text();
-
+        if(description.equals("Đọc Truyện")){
+            description = html.selectFirst("div#tab-over div.tab-text").text();
+        }
 // Loại bỏ tất cả <br> trong mô tả và thay bằng dòng mới
         description = description.replaceAll("<br>", "\n");
+        description = description.replaceAll("(?i)</?strong>", "");
+        description = description.replaceAll("\u00A0", " ");
 
 // Lấy thể loại
         Element lst_tag = html.selectFirst("div.lst-tag");
@@ -104,13 +108,17 @@ public class ThichTruyen extends BaseCrawler {
 
     @Override
     protected ChapterDetail parseChapterDetailHTML(Document html) {
+        Elements lis = html.select("div.main-breadcrumb ul li");
+        String novelTitle = lis.get(2).selectFirst("a").text();
+        String url = pluginUrl + "/" + lis.get(2).selectFirst("a").attr("href");
+
         String title = html.selectFirst("div.story-detail-header h1").text();
 //        Replace all nbsp with space
         title = title.replaceAll("\u00A0", " ");
         String content = html.selectFirst("div.story-detail-content").text();
-        String url = html.baseUri();
+        content = content.replaceAll("(?i)<br\\s*/?>", "");
 
-        ChapterDetail chapterDetail = new ChapterDetail(title, url, content);
+        ChapterDetail chapterDetail = new ChapterDetail(novelTitle,title, url, content);
 
         String nextChapter = html.selectFirst("div.next-previous a").attr("href");
         if(nextChapter.contains("javascript")){

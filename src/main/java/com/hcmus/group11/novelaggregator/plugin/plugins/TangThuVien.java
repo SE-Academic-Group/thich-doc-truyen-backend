@@ -93,10 +93,13 @@ public class TangThuVien extends BaseCrawler {
 
     @Override
     protected ChapterDetail parseChapterDetailHTML(Document html) {
+        String novelTitle = html.selectFirst("h1.truyen-title a").text();
         String title = html.selectFirst("h2").text();
 //        Replace all nbsp with space
         title = title.replaceAll("\u00A0", " ");
         String content = html.selectFirst(".box-chap").text();
+        content = content.replaceAll("(?i)<br\\s*/?>", "");
+
         String url = html.baseUri();
 
         String prevPage, nextPage;
@@ -112,7 +115,7 @@ public class TangThuVien extends BaseCrawler {
         nextPage = url.substring(0, url.lastIndexOf("-") + 1) + (currentId + 1);
 
 
-        ChapterDetail chapterDetail = new ChapterDetail(title, url, content);
+        ChapterDetail chapterDetail = new ChapterDetail(novelTitle, title, url, content);
         ResponseMetadata metadata = new ResponseMetadata();
         metadata.addMetadataValue("prevPage", prevPage);
         metadata.addMetadataValue("nextPage", nextPage);
