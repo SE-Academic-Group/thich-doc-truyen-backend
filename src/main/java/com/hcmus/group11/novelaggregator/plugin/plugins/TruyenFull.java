@@ -31,8 +31,12 @@ public class TruyenFull extends BaseApi {
             Map<String, Object> jsonMap = objectMapper.readValue(jsonChapterDetail, Map.class);
             Map<String, Object> data = (Map<String, Object>) jsonMap.get("data");
 
+            chapterDetail.setNovelTitle((String) data.get("story_name"));
             chapterDetail.setTitle((String) data.get("chapter_name"));
-            chapterDetail.setContent((String) data.get("content"));
+
+            String content = (String) data.get("content");
+            content = content.replaceAll("(?i)<br\\s*/?>", "");
+            chapterDetail.setContent(content);
 
             Integer id = (Integer) data.get("chapter_id");
             chapterDetail.setUrl(buildChapterDetailUrl(id));
@@ -121,7 +125,9 @@ public class TruyenFull extends BaseApi {
             novelDetail.setImage((String) data.get("image"));
             novelDetail.setUrl(buildNovelDetailUrl( (Integer) data.get("id"), null));
             novelDetail.setNChapter((Integer) data.get("total_chapters"));
-            novelDetail.setDescription((String) data.get("description"));
+            String description = (String) data.get("description");
+            description = description.replaceAll("(?i)<br\\s*/?>", "");
+            novelDetail.setDescription(description);
 
             List<String> listCategories = Arrays.asList(((String) data.get("categories")).split(",\\s*"));
             novelDetail.setGenres(listCategories);
