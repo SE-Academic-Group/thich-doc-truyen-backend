@@ -6,6 +6,7 @@ import com.hcmus.group11.novelaggregator.plugin.BaseApi;
 import com.hcmus.group11.novelaggregator.type.*;
 import com.hcmus.group11.novelaggregator.util.RequestAttributeUtil;
 import org.springframework.stereotype.Component;
+
 import java.util.Optional;
 
 import java.util.*;
@@ -20,7 +21,7 @@ public class TruyenFull extends BaseApi {
 
     public final String BASE_URL = "https://api.truyenfull.vn/v1";
     public final String SEARCH_URL = BASE_URL + "/tim-kiem?title={{keyword}}&page={{page}}";
-    public final String NOVEL_DETAIL_BASE_URL = BASE_URL+ "/story/detail/";
+    public final String NOVEL_DETAIL_BASE_URL = BASE_URL + "/story/detail/";
     public final String CHAPTER_DETAIL_BASE_URL = BASE_URL + "/chapter/detail/";
 
     @Override
@@ -47,12 +48,12 @@ public class TruyenFull extends BaseApi {
             Map<String, Optional> map = new HashMap<>();
 
             String nextChapterDetailUrl = null;
-            if(nextChapterId != null){
+            if (nextChapterId != null) {
                 nextChapterDetailUrl = buildChapterDetailUrl(nextChapterId);
             }
 
             String prevChapterDetailUrl = null;
-            if(prevChapterId != null){
+            if (prevChapterId != null) {
                 prevChapterDetailUrl = buildChapterDetailUrl(prevChapterId);
             }
 
@@ -92,7 +93,8 @@ public class TruyenFull extends BaseApi {
                 ChapterInfo chapterInfo = new ChapterInfo();
                 chapterInfo.setTitle((String) data.get("title"));
                 chapterInfo.setUrl(buildChapterDetailUrl((Integer) data.get("id")));
-                chapterInfo.setIndex(startId ++);
+                startId++;
+                chapterInfo.setIndex(startId.toString());
 
                 chapterList.add(chapterInfo);
             }
@@ -123,7 +125,7 @@ public class TruyenFull extends BaseApi {
             novelDetail.setTitle((String) data.get("title"));
             novelDetail.setAuthor((String) data.get("author"));
             novelDetail.setImage((String) data.get("image"));
-            novelDetail.setUrl(buildNovelDetailUrl( (Integer) data.get("id"), null));
+            novelDetail.setUrl(buildNovelDetailUrl((Integer) data.get("id"), null));
             novelDetail.setNChapter((Integer) data.get("total_chapters"));
             String description = (String) data.get("description");
             description = description.replaceAll("(?i)<br\\s*/?>", "");
@@ -154,7 +156,7 @@ public class TruyenFull extends BaseApi {
                 novelSearchResult.setTitle((String) data.get("title"));
                 novelSearchResult.setAuthor((String) data.get("author"));
                 novelSearchResult.setImage((String) data.get("image"));
-                novelSearchResult.setUrl(buildNovelDetailUrl( (Integer) data.get("id"), null));
+                novelSearchResult.setUrl(buildNovelDetailUrl((Integer) data.get("id"), null));
                 novelSearchResult.setNChapter((Integer) data.get("total_chapters"));
 
                 novelSearchResults.add(novelSearchResult);
@@ -187,7 +189,7 @@ public class TruyenFull extends BaseApi {
     }
 
     @Override
-    protected String buildNovelDetailUrl( Integer id, String type) {
+    protected String buildNovelDetailUrl(Integer id, String type) {
 
         String result = NOVEL_DETAIL_BASE_URL + id;
 
@@ -201,8 +203,7 @@ public class TruyenFull extends BaseApi {
     @Override
     protected String buildChapterListUrlFromNovelDetailUrl(String url, Integer page) {
         String result = url;
-        if(!url.contains("/chapters?page"))
-        {
+        if (!url.contains("/chapters?page")) {
             result += "/chapters?page=" + page;
         }
 
@@ -222,5 +223,46 @@ public class TruyenFull extends BaseApi {
         }
 
         RequestAttributeUtil.setAttribute("metadata", metadata);
+    }
+
+    @Override
+    public List<ChapterInfo> getFullChapterList(String url) {
+        try {
+            Integer currentPage = 1;
+            Integer maxPage = 1;
+            List<ChapterInfo> chapterList = new ArrayList<>();
+
+            for (int i = currentPage; i <= maxPage; i++) {
+                Integer page = 1;
+                String chapterListUrl = buildChapterListUrlFromNovelDetailUrl(url, page);
+                String jsonChapterListString = getJsonString(chapterListUrl);
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, Object> jsonMap = objectMapper.readValue(jsonChapterListString, Map.class);
+                List<Map<String, Object>> dataList = (List<Map<String, Object>>) jsonMap.get("data");
+
+                Map<String, Object> meta = (Map<String, Object>) jsonMap.get("meta");
+                Map<String, Object> pagination = (Map<String, Object>) meta.get("pagination");
+                Map<String, Object> links = (Map<String, Object>) pagination.get("links");
+
+                Integer perPage = (Integer) pagination.get("per_page");
+                maxPage = (Integer) pagination.get("total_pages");
+
+                Integer startId = (currentPage - 1) * perPage + 1;
+                for (Map<String, Object> data : dataList) {
+                    ChapterInfo chapterInfo = new ChapterInfo();
+                    chapterInfo.setTitle((String) data.get("title"));
+                    chapterInfo.setUrl(buildChapterDetailUrl((Integer) data.get("id")));
+                    startId++;
+                    chapterInfo.setIndex(startId.toString());
+
+                    chapterList.add(chapterInfo);
+                }
+
+            }
+            return chapterList;
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

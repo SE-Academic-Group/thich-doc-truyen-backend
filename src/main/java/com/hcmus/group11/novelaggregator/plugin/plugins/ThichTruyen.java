@@ -10,8 +10,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Component
 public class ThichTruyen extends BaseCrawler {
@@ -35,10 +33,10 @@ public class ThichTruyen extends BaseCrawler {
         for (Element li : lis) {
             // Extract information
             String title = li.selectFirst("h3.view-category-item-title").text();
-            String url = pluginUrl + "/" + li.selectFirst("a").attr("href");
+            String url = this.pluginUrl + "/" + li.selectFirst("a").attr("href");
 
             String author = li.selectFirst("p.view-category-item-author a").text();
-            String image = pluginUrl + "/" + li.selectFirst("div.view-category-item-image img").attr("src");
+            String image = this.pluginUrl + "/" + li.selectFirst("div.view-category-item-image img").attr("src");
             Elements infor_list = li.select("div.view-category-item-infor p");
             String nChapterText = infor_list.get(2).text().split(" ")[0];
             Integer nChapter = Integer.parseInt(nChapterText);
@@ -110,7 +108,7 @@ public class ThichTruyen extends BaseCrawler {
     protected ChapterDetail parseChapterDetailHTML(Document html) {
         Elements lis = html.select("div.main-breadcrumb ul li");
         String novelTitle = lis.get(2).selectFirst("a").text();
-        String url = pluginUrl + "/" + lis.get(2).selectFirst("a").attr("href");
+        String url = this.pluginUrl + "/" + lis.get(2).selectFirst("a").attr("href");
 
         String title = html.selectFirst("div.story-detail-header h1").text();
 //        Replace all nbsp with space
@@ -125,7 +123,7 @@ public class ThichTruyen extends BaseCrawler {
             nextChapter = null;
         }
         else{
-            nextChapter = pluginUrl + "/" + nextChapter;
+            nextChapter = this.pluginUrl + "/" + nextChapter;
         }
 
         String previousChapter = html.selectFirst("div.prev-previous a").attr("href");
@@ -133,7 +131,7 @@ public class ThichTruyen extends BaseCrawler {
             previousChapter = null;
         }
         else{
-            previousChapter = pluginUrl + "/" + previousChapter;
+            previousChapter = this.pluginUrl + "/" + previousChapter;
         }
 
         ResponseMetadata metadata = new ResponseMetadata();
@@ -153,9 +151,18 @@ public class ThichTruyen extends BaseCrawler {
         List<ChapterInfo> chapterInfos = parseChapterListHTML(chapterListHtml);
         ResponseMetadata metadata = parseChapterListMetadata(chapterListHtml);
         metadata.addMetadataValue("currentPage", page);
-        metadata.addMetadataValue("pluginName", pluginName);
+        metadata.addMetadataValue("name", pluginName);
 
         RequestAttributeUtil.setAttribute("metadata", metadata);
+
+        return chapterInfos;
+    }
+
+    @Override
+    public List<ChapterInfo> getFullChapterList(String url) {
+        Document chapterListHtml = getHtml(url);
+
+        List<ChapterInfo> chapterInfos = parseChapterListHTML(chapterListHtml);
 
         return chapterInfos;
     }
@@ -169,9 +176,10 @@ public class ThichTruyen extends BaseCrawler {
             Element chapterInfoElement = chapterElement.selectFirst("a");
 
             String title = chapterInfoElement.attr("title");
-            String url = pluginUrl + "/" + chapterInfoElement.attr("href");
+            String url = this.pluginUrl + "/" + chapterInfoElement.attr("href");
 
-            ChapterInfo chapterInfo = new ChapterInfo(title, url, chapterIndex ++);
+            chapterIndex++;
+            ChapterInfo chapterInfo = new ChapterInfo(title, url, chapterIndex.toString());
             chapterInfos.add(chapterInfo);
         }
 

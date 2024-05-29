@@ -97,7 +97,8 @@ public class NovelController {
 
     @Operation(summary = "Get chapter detail",
             parameters = {
-                    @Parameter(name = "url", description = "URL of the chapter", required = true, example = "http://example.com/chapter"),
+                    @Parameter(name="novelUrl", description = "URL of the novel", required = true, example = "http://example.com/novel"),
+                    @Parameter(name = "chapterUrl", description = "URL of the chapter", required = true, example = "http://example.com/chapter"),
                     @Parameter(name = "pluginName", description = "Name of the plugin to use for getting chapter detail", required = true, example = "truyenFull")
             },
             responses = {
@@ -109,7 +110,27 @@ public class NovelController {
             }
     )
     @GetMapping("/{pluginName}/chapter-detail")
-    public Object getChapterDetail(@RequestParam() String url, @PathVariable() String pluginName) {
-        return novelService.getChapterDetail(url, pluginName);
+    public Object getChapterDetail(@RequestParam() String chapterUrl,@RequestParam String novelUrl , @PathVariable() String pluginName) {
+        return novelService.getChapterDetail(chapterUrl, pluginName);
     }
+
+    @Operation(summary = "Get full chapter list",
+            parameters = {
+                    @Parameter(name = "url", description = "URL of the novel", required = true, example = "http://example.com/novel"),
+                    @Parameter(name = "pluginName", description = "Name of the plugin to use for getting full chapter list", required = true, example = "truyenFull")
+            },
+            responses = {
+                    @ApiResponse(description = "List of all chapters",
+                            responseCode = "200",
+                            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ChapterInfo.class)))),
+                    @ApiResponse(description = "Invalid URL", responseCode = "400",
+                            content = @Content(schema = @Schema(example = "null")))
+            }
+    )
+    @GetMapping("/{pluginName}/full-chapter-list")
+    public Object getFullChapterList(@RequestParam() String url, @PathVariable() String pluginName) {
+        return novelService.getFullChapterList(url, pluginName);
+    }
+
+
 }

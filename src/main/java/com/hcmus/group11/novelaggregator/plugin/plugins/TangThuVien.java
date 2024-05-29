@@ -119,7 +119,7 @@ public class TangThuVien extends BaseCrawler {
         ResponseMetadata metadata = new ResponseMetadata();
         metadata.addMetadataValue("prevPage", prevPage);
         metadata.addMetadataValue("nextPage", nextPage);
-        metadata.addMetadataValue("pluginName", pluginName);
+        metadata.addMetadataValue("name", pluginName);
         RequestAttributeUtil.setAttribute("metadata", metadata);
 
         return chapterDetail;
@@ -130,23 +130,71 @@ public class TangThuVien extends BaseCrawler {
         page = Math.max(page - 1, 0);
         Document html = getHtml(novelDetailUrl);
         String storyId = html.selectFirst("input#story_id_hidden").attr("value");
-        String url = pluginUrl + "/doc-truyen/page/" + storyId + "?page=" + page + "&limit=75&web=1";
+        String url = this.pluginUrl + "/doc-truyen/page/" + storyId + "?page=" + page + "&limit=75&web=1";
 
         Document chapterListHtml = getHtml(url);
 
         List<ChapterInfo> chapterInfos = parseChapterListHTML(chapterListHtml);
         ResponseMetadata metadata = parseChapterListMetadata(chapterListHtml);
         metadata.addMetadataValue("currentPage", page + 1);
-        metadata.addMetadataValue("pluginName", pluginName);
+        metadata.addMetadataValue("name", pluginName);
 
         RequestAttributeUtil.setAttribute("metadata", metadata);
 
         return chapterInfos;
     }
 
+    @Override
+    public List<ChapterInfo> getFullChapterList(String novelUrl) {
+        Integer page = 0;
+        Document html = getHtml(novelUrl);
+        String storyId = html.selectFirst("input#story_id_hidden").attr("value");
+        String url = this.pluginUrl + "/doc-truyen/page/" + storyId + "?page=" + page + "&limit=75&web=1";
+        Integer MaxPage = maxChapterListPage(html);
+        List<ChapterInfo> result = new ArrayList<>();
+
+        for(Integer i = 0; i <= MaxPage; i++){
+            page = i;
+            String urlPage = this.pluginUrl + "/doc-truyen/page/" + storyId + "?page=" + page + "&limit=75&web=1";
+            Document chapterListHtml = getHtml(urlPage);
+            List<ChapterInfo> chapterInfos = parseChapterListHTML(chapterListHtml);
+
+            result.addAll(chapterInfos);
+        }
+
+        return result;
+    }
+
+    public Integer maxChapterListPage(Document html){
+        Elements paginationItems = html.select("ul.pagination li a");
+
+        int lastLoadingNumber = -1;
+        int maxLoadingNumber = -1;
+
+        for (Element item : paginationItems) {
+            String onclickAttr = item.attr("onclick");
+            if (onclickAttr.startsWith("Loading(")) {
+                String numberString = onclickAttr.replaceAll("[^0-9]", "");
+                int number = Integer.parseInt(numberString);
+
+                maxLoadingNumber = Math.max(maxLoadingNumber, number);
+
+                if (item.text().contains("Trang cuối")) {
+                    lastLoadingNumber = number;
+                    break;
+                }
+            }
+        }
+
+        int result = (lastLoadingNumber != -1) ? lastLoadingNumber : maxLoadingNumber;
+
+        return result;
+
+    }
+
     private List<ChapterInfo> parseChapterListHTML(Document html) {
         List<ChapterInfo> chapterInfos = new ArrayList<>();
-        Elements chapterElements = html.select("ul.cf li");
+        Elements chapterElements = html.select("ul li");
         for (Element chapterElement : chapterElements) {
             Element chapterTitleElement = chapterElement.selectFirst("a");
 
@@ -162,8 +210,20 @@ public class TangThuVien extends BaseCrawler {
             String title = chapterElement.selectFirst("a").text();
             String url = chapterElement.selectFirst("a").attr("href");
 //            Title format is "Chương {chapterIndex} : {chapterTitle}"
-            String chapterIndexText = title.split(":")[0].replaceAll("[^0-9]", "");
-            Integer chapterIndex = Integer.parseInt(chapterIndexText);
+            int startIndex = title.indexOf("Chương") + "Chương".length() + 1;
+            int endIndex = title.indexOf(":");
+            String chapterIndex = "";
+            if (startIndex != -1 && endIndex != -1 && startIndex < endIndex){
+                chapterIndex = title.substring(startIndex, endIndex).trim();
+            }
+            else{
+                continue;
+            }
+
+            if(chapterIndex.endsWith(" ")){
+                chapterIndex = chapterIndex.substring(0, chapterIndex.length() - 1);
+            }
+
             title = title.split(":")[1].trim();
 
             ChapterInfo chapterInfo = new ChapterInfo(title, url, chapterIndex);
