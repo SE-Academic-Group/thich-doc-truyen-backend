@@ -20,5 +20,5 @@ public class ChapterInfo {
     private String url;
 
     @Schema(description = "Index of the chapter", example = "1")
-    private Integer index;
+    private String index;
 }

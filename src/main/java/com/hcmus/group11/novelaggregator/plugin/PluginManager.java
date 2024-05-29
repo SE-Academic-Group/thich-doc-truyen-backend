@@ -29,8 +29,8 @@ public class PluginManager {
         List<PluginMetadata> pluginMetadataList = new ArrayList<>();
         for (INovelPlugin plugin : novelPluginMap.values()) {
             PluginMetadata pluginMetadata = new PluginMetadata();
-            pluginMetadata.setPluginName(plugin.getPluginName());
-            pluginMetadata.setPluginUrl(plugin.getPluginUrl());
+            pluginMetadata.setName(plugin.getPluginName());
+            pluginMetadata.setUrl(plugin.getPluginUrl());
             pluginMetadataList.add(pluginMetadata);
         }
 

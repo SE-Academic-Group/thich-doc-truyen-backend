@@ -38,4 +38,9 @@ public class NovelService {
         INovelPlugin plugin = pluginManager.getPlugin(pluginName);
         return plugin.getChapterDetail(url);
     }
+
+    public List<ChapterInfo> getFullChapterList(String url, String pluginName) {
+        INovelPlugin plugin = pluginManager.getPlugin(pluginName);
+        return plugin.getFullChapterList(url);
+    }
 }

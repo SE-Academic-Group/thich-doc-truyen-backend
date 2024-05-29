@@ -12,8 +12,8 @@ import lombok.Setter;
 @Schema(description = "Metadata of a plugin")
 public class PluginMetadata {
     @Schema(description = "Name of the plugin", example = "Example Plugin")
-    private String pluginName;
+    private String name;
 
     @Schema(description = "URL of the plugin", example = "http://example.com/plugin")
-    private String pluginUrl;
+    private String url;
 }
