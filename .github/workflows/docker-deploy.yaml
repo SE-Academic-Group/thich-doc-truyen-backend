@@ -14,6 +14,7 @@ jobs:
 
       - name: build the app
         run: |
+          chmod +x mvnw
           ./mvnw clean package
 
       - name: build the docker image
