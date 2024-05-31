@@ -1,5 +1,6 @@
 package com.hcmus.group11.novelaggregator.controller;
 
+import com.hcmus.group11.novelaggregator.exception.type.TransformedHttpException;
 import com.hcmus.group11.novelaggregator.service.NovelService;
 import com.hcmus.group11.novelaggregator.type.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,8 +32,12 @@ public class NovelController {
                     @ApiResponse(description = "List of novels matching the search criteria",
                             responseCode = "200",
                             content = @Content(array = @ArraySchema(schema = @Schema(implementation = NovelSearchResult.class)))),
-                    @ApiResponse(description = "Invalid input", responseCode = "400",
-                            content = @Content(schema = @Schema(example = "null")))
+                    @ApiResponse(responseCode = "400", description = "Invalid input",
+                            content = @Content(schema = @Schema(implementation = TransformedHttpException.class))),
+                    @ApiResponse(responseCode = "404", description = "Not Found",
+                            content = @Content(schema = @Schema(implementation = TransformedHttpException.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error",
+                            content = @Content(schema = @Schema(implementation = TransformedHttpException.class)))
             }
     )
     @GetMapping("/{pluginName}/search")
@@ -52,8 +57,12 @@ public class NovelController {
                     @ApiResponse(description = "Details of the novel",
                             responseCode = "200",
                             content = @Content(schema = @Schema(implementation = NovelDetail.class))),
-                    @ApiResponse(description = "Invalid URL", responseCode = "400",
-                            content = @Content(schema = @Schema(example = "null")))
+                    @ApiResponse(responseCode = "400", description = "Invalid URL",
+                            content = @Content(schema = @Schema(implementation = TransformedHttpException.class))),
+                    @ApiResponse(responseCode = "404", description = "Not Found",
+                            content = @Content(schema = @Schema(implementation = TransformedHttpException.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error",
+                            content = @Content(schema = @Schema(implementation = TransformedHttpException.class)))
             }
     )
     @GetMapping("/{pluginName}/novel-detail")
@@ -71,8 +80,12 @@ public class NovelController {
                     @ApiResponse(description = "List of chapters",
                             responseCode = "200",
                             content = @Content(array = @ArraySchema(schema = @Schema(implementation = ChapterInfo.class)))),
-                    @ApiResponse(description = "Invalid URL or page number", responseCode = "400",
-                            content = @Content(schema = @Schema(example = "null")))
+                    @ApiResponse(responseCode = "400", description = "Invalid URL or page number",
+                            content = @Content(schema = @Schema(implementation = TransformedHttpException.class))),
+                    @ApiResponse(responseCode = "404", description = "Not Found",
+                            content = @Content(schema = @Schema(implementation = TransformedHttpException.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error",
+                            content = @Content(schema = @Schema(implementation = TransformedHttpException.class)))
             }
     )
     @GetMapping("/{pluginName}/chapter-list")
@@ -87,7 +100,9 @@ public class NovelController {
             responses = {
                     @ApiResponse(description = "List of available plugins",
                             responseCode = "200",
-                            content = @Content(array = @ArraySchema(schema = @Schema(implementation = PluginMetadata.class))))
+                            content = @Content(array = @ArraySchema(schema = @Schema(implementation = PluginMetadata.class)))),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error",
+                            content = @Content(schema = @Schema(implementation = TransformedHttpException.class)))
             }
     )
     @GetMapping("/plugin-list")
@@ -105,8 +120,12 @@ public class NovelController {
                     @ApiResponse(description = "Details of the chapter",
                             responseCode = "200",
                             content = @Content(schema = @Schema(implementation = ChapterDetail.class))),
-                    @ApiResponse(description = "Invalid URL", responseCode = "400",
-                            content = @Content(schema = @Schema(example = "null")))
+                    @ApiResponse(responseCode = "400", description = "Invalid URL",
+                            content = @Content(schema = @Schema(implementation = TransformedHttpException.class))),
+                    @ApiResponse(responseCode = "404", description = "Not Found",
+                            content = @Content(schema = @Schema(implementation = TransformedHttpException.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error",
+                            content = @Content(schema = @Schema(implementation = TransformedHttpException.class)))
             }
     )
     @GetMapping("/{pluginName}/chapter-detail")
@@ -123,8 +142,12 @@ public class NovelController {
                     @ApiResponse(description = "List of all chapters",
                             responseCode = "200",
                             content = @Content(array = @ArraySchema(schema = @Schema(implementation = ChapterInfo.class)))),
-                    @ApiResponse(description = "Invalid URL", responseCode = "400",
-                            content = @Content(schema = @Schema(example = "null")))
+                    @ApiResponse(responseCode = "400", description = "Invalid URL",
+                            content = @Content(schema = @Schema(implementation = TransformedHttpException.class))),
+                    @ApiResponse(responseCode = "404", description = "Not Found",
+                            content = @Content(schema = @Schema(implementation = TransformedHttpException.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error",
+                            content = @Content(schema = @Schema(implementation = TransformedHttpException.class)))
             }
     )
     @GetMapping("/{pluginName}/full-chapter-list")
