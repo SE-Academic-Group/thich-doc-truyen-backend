@@ -97,7 +97,7 @@ public class NovelController {
 
     @Operation(summary = "Get chapter detail",
             parameters = {
-                    @Parameter(name="novelUrl", description = "URL of the novel", required = true, example = "http://example.com/novel"),
+                    @Parameter(name = "novelUrl", description = "URL of the novel", required = true, example = "http://example.com/novel"),
                     @Parameter(name = "chapterUrl", description = "URL of the chapter", required = true, example = "http://example.com/chapter"),
                     @Parameter(name = "pluginName", description = "Name of the plugin to use for getting chapter detail", required = true, example = "truyenFull")
             },
@@ -110,7 +110,7 @@ public class NovelController {
             }
     )
     @GetMapping("/{pluginName}/chapter-detail")
-    public Object getChapterDetail(@RequestParam() String chapterUrl,@RequestParam String novelUrl , @PathVariable() String pluginName) {
+    public Object getChapterDetail(@RequestParam() String chapterUrl, @RequestParam String novelUrl, @PathVariable() String pluginName) {
         return novelService.getChapterDetail(chapterUrl, pluginName);
     }
 
@@ -131,6 +131,4 @@ public class NovelController {
     public Object getFullChapterList(@RequestParam() String url, @PathVariable() String pluginName) {
         return novelService.getFullChapterList(url, pluginName);
     }
-
-
 }
