@@ -9,13 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Setter
 @Getter
-@Schema(description = "HTTP exception"
-        , example = "{\"errorCode\": \"NOVEL_NOT_FOUND\"}"
-        , oneOf = {HttpException.class}
-        , implementation = HttpException.class
-)
 public class HttpException extends ResponseStatusException {
-    @Schema(description = "Application specific error code", example = "NOVEL_NOT_FOUND")
     private String errorCode;
 
     public HttpException(HttpStatusCode status) {
