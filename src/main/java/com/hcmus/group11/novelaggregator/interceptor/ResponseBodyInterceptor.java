@@ -36,7 +36,7 @@ public class ResponseBodyInterceptor implements ResponseBodyAdvice<Object> {
 
         ResponseMetadata metadata = (ResponseMetadata) RequestAttributeUtil.getAttribute("metadata");
         if (metadata != null) {
-            ApiResponse<Object> responseObject = new ApiResponse<>(body, metadata.getMetadata());
+            ApiResponse<Object> responseObject = new ApiResponse<>(body, metadata.getMetadata(), null);
             return responseObject;
         }
         return new ApiResponse<>(body);
