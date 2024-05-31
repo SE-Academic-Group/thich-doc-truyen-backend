@@ -5,6 +5,7 @@ import com.hcmus.group11.novelaggregator.type.ResponseMetadata;
 import com.hcmus.group11.novelaggregator.util.RequestAttributeUtil;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -18,6 +19,10 @@ public class ResponseBodyInterceptor implements ResponseBodyAdvice<Object> {
 
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
+        if (returnType.getParameterType().equals(ResponseEntity.class)) {
+            return false;
+        }
+
         return true;  // Apply to all responses, can be refined to specific ones if needed
     }
 
