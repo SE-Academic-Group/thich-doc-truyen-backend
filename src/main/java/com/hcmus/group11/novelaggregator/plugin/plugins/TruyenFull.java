@@ -232,8 +232,8 @@ public class TruyenFull extends BaseApi {
             Integer maxPage = 1;
             List<ChapterInfo> chapterList = new ArrayList<>();
 
-            for (int i = currentPage; i <= maxPage; i++) {
-                Integer page = 1;
+            while(currentPage <= maxPage) {
+                Integer page = currentPage;
                 String chapterListUrl = buildChapterListUrlFromNovelDetailUrl(url, page);
                 String jsonChapterListString = getJsonString(chapterListUrl);
 
@@ -253,11 +253,14 @@ public class TruyenFull extends BaseApi {
                     ChapterInfo chapterInfo = new ChapterInfo();
                     chapterInfo.setTitle((String) data.get("title"));
                     chapterInfo.setUrl(buildChapterDetailUrl((Integer) data.get("id")));
-                    startId++;
+
                     chapterInfo.setIndex(startId.toString());
+                    startId++;
 
                     chapterList.add(chapterInfo);
                 }
+
+                currentPage ++;
 
             }
             return chapterList;
