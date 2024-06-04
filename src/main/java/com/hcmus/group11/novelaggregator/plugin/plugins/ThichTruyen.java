@@ -1,11 +1,13 @@
 package com.hcmus.group11.novelaggregator.plugin.plugins;
 
+import com.hcmus.group11.novelaggregator.exception.type.HttpException;
 import com.hcmus.group11.novelaggregator.plugin.BaseCrawler;
 import com.hcmus.group11.novelaggregator.type.*;
 import com.hcmus.group11.novelaggregator.util.RequestAttributeUtil;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -30,6 +32,7 @@ public class ThichTruyen extends BaseCrawler {
 
         //        Get ul child from div.book-img-text
         Elements lis = html.select("div.view-category-item");
+
         for (Element li : lis) {
             // Extract information
             String title = li.selectFirst("h3.view-category-item-title").text();
@@ -50,6 +53,7 @@ public class ThichTruyen extends BaseCrawler {
 
     @Override
     protected NovelDetail parseNovelDetailHTML(Document html) {
+
         String title = html.selectFirst("h1.story-intro-title").text();
         String author = html.selectFirst("p.story-intro-author a").text();
         String image = pluginUrl + "/" + html.selectFirst("div.story-intro-image img").attr("src");
@@ -60,9 +64,7 @@ public class ThichTruyen extends BaseCrawler {
         if(description.equals("Đọc Truyện")){
             description = html.selectFirst("div#tab-over div.tab-text").text();
         }
-// Loại bỏ tất cả <br> trong mô tả và thay bằng dòng mới
-        description = description.replaceAll("<br>", "\n");
-        description = description.replaceAll("(?i)</?strong>", "");
+
         description = description.replaceAll("\u00A0", " ");
 
 // Lấy thể loại
