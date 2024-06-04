@@ -1,5 +1,6 @@
 package com.hcmus.group11.novelaggregator.plugin;
 
+import com.hcmus.group11.novelaggregator.exception.type.HttpException;
 import com.hcmus.group11.novelaggregator.type.ChapterDetail;
 import com.hcmus.group11.novelaggregator.type.ChapterInfo;
 import com.hcmus.group11.novelaggregator.type.NovelDetail;
@@ -28,7 +29,9 @@ public abstract class BaseApi implements INovelPlugin{
         String jsonChapterDetailString = getJsonString(url);
 
         ChapterDetail chapterDetail = getChapterDetailFromJsonString(jsonChapterDetailString);
-
+        if(chapterDetail == null) {
+            throw HttpException.NOT_FOUND("NOT_FOUND", "No result found for chapter url: " + url);
+        }
         return chapterDetail;
     }
 
@@ -38,6 +41,9 @@ public abstract class BaseApi implements INovelPlugin{
         String jsonChapterListString = getJsonString(chapterListUrl);
 
         List<ChapterInfo> chapterList = getChapterListFromJsonString(jsonChapterListString);
+        if(chapterList == null || chapterList.isEmpty()) {
+            throw HttpException.NOT_FOUND("NOT_FOUND", "No result found for novel url: " + url + " page: " + page);
+        }
 
         return chapterList;
     }
@@ -47,6 +53,9 @@ public abstract class BaseApi implements INovelPlugin{
         String jsonDetailString = getJsonString(url);
 
         NovelDetail novelDetail = getNovelDetailFromJsonString(jsonDetailString);
+        if(novelDetail == null) {
+            throw HttpException.NOT_FOUND("NOT_FOUND", "No result found for url: " + url);
+        }
 
         return novelDetail;
     }
@@ -55,9 +64,10 @@ public abstract class BaseApi implements INovelPlugin{
     public List<NovelSearchResult> search(String keyword, Integer page){
         String searchUrl = buildSearchUrl(keyword, page);
         String jsonString = getJsonString(searchUrl);
-
         List<NovelSearchResult> novelSearchResults = getSearchDataFromJsonString(jsonString);
-
+        if(novelSearchResults == null || novelSearchResults.isEmpty()) {
+            throw HttpException.NOT_FOUND("NOT_FOUND", "No result found for keyword: " + keyword);
+        }
         return novelSearchResults;
     }
 
@@ -72,8 +82,7 @@ public abstract class BaseApi implements INovelPlugin{
             return jsonString;
         }
         catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            throw HttpException.NOT_FOUND("NOT_FOUND", "No result found for url: " + url);
         }
     }
 

@@ -1,5 +1,6 @@
 package com.hcmus.group11.novelaggregator.plugin;
 
+import com.hcmus.group11.novelaggregator.exception.type.HttpException;
 import com.hcmus.group11.novelaggregator.type.*;
 import com.hcmus.group11.novelaggregator.util.RequestAttributeUtil;
 import lombok.AllArgsConstructor;
@@ -29,6 +30,9 @@ public abstract class BaseCrawler implements INovelPlugin {
         Document html = getHtml(searchUrl);
 
         List<NovelSearchResult> novelSearchResults = parseSearchHTML(html);
+        if(novelSearchResults == null || novelSearchResults.isEmpty()) {
+            throw HttpException.NOT_FOUND("NOT_FOUND", "No result found for keyword: " + keyword);
+        }
         ResponseMetadata metadata = parseSearchMetadata(html);
         metadata.addMetadataValue("currentPage", page);
         metadata.addMetadataValue("name", pluginName);
@@ -60,6 +64,8 @@ public abstract class BaseCrawler implements INovelPlugin {
 
             // Tìm vị trí dấu '/' đầu tiên sau phần "//" để tách base URL và path URL
             int indexOfSlash = url.indexOf("/", url.indexOf("//") + 2);
+            if(indexOfSlash == -1 || indexOfSlash == url.length() - 1)
+                throw new RuntimeException("The URL redirects to the homepage.");
 
             // Tách phần base URL và path URL
             String baseUrl = url.substring(0, indexOfSlash);
@@ -74,8 +80,7 @@ public abstract class BaseCrawler implements INovelPlugin {
 
             return encodedUrl;
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException(e.getMessage());
         }
     }
 
@@ -106,8 +111,7 @@ public abstract class BaseCrawler implements INovelPlugin {
 
             return doc;
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            throw HttpException.NOT_FOUND("NOT_FOUND", e.getMessage());
         }
     }
 

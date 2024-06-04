@@ -1,5 +1,6 @@
 package com.hcmus.group11.novelaggregator.plugin;
 
+import com.hcmus.group11.novelaggregator.exception.type.HttpException;
 import com.hcmus.group11.novelaggregator.type.PluginMetadata;
 import org.springframework.stereotype.Service;
 
@@ -18,8 +19,9 @@ public class PluginManager {
     public INovelPlugin getPlugin(String pluginName) {
         INovelPlugin plugin = novelPluginMap.get(pluginName);
         if (plugin == null) {
-            // Get the first plugin if pluginName is null
-            plugin = novelPluginMap.values().iterator().next();
+//            // Get the first plugin if pluginName is null
+//            plugin = novelPluginMap.values().iterator().next();
+            throw HttpException.NOT_FOUND("NOT_FOUND", "Plugin not found: " + pluginName);
         }
         
         return plugin;
