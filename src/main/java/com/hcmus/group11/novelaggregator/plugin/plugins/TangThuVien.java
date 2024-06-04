@@ -153,7 +153,7 @@ public class TangThuVien extends BaseCrawler {
         Integer MaxPage = maxChapterListPage(html);
         List<ChapterInfo> result = new ArrayList<>();
 
-        for(Integer i = 0; i <= MaxPage; i++){
+        for (Integer i = 0; i <= MaxPage; i++) {
             page = i;
             String urlPage = this.pluginUrl + "/doc-truyen/page/" + storyId + "?page=" + page + "&limit=75&web=1";
             Document chapterListHtml = getHtml(urlPage);
@@ -165,7 +165,7 @@ public class TangThuVien extends BaseCrawler {
         return result;
     }
 
-    public Integer maxChapterListPage(Document html){
+    public Integer maxChapterListPage(Document html) {
         Elements paginationItems = html.select("ul.pagination li a");
 
         int lastLoadingNumber = -1;
@@ -213,14 +213,13 @@ public class TangThuVien extends BaseCrawler {
             int startIndex = title.indexOf("Chương") + "Chương".length() + 1;
             int endIndex = title.indexOf(":");
             String chapterIndex = "";
-            if (startIndex != -1 && endIndex != -1 && startIndex < endIndex){
+            if (startIndex != -1 && endIndex != -1 && startIndex < endIndex) {
                 chapterIndex = title.substring(startIndex, endIndex).trim();
-            }
-            else{
+            } else {
                 continue;
             }
 
-            if(chapterIndex.endsWith(" ")){
+            if (chapterIndex.endsWith(" ")) {
                 chapterIndex = chapterIndex.substring(0, chapterIndex.length() - 1);
             }
 

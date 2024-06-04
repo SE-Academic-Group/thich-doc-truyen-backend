@@ -10,9 +10,11 @@ import java.util.Map;
 @Service
 public class PluginManager {
     private Map<String, INovelPlugin> novelPluginMap;
+    private PluginLoader pluginLoader;
 
-    public PluginManager(Map<String, INovelPlugin> novelPluginMap) {
+    public PluginManager(Map<String, INovelPlugin> novelPluginMap, PluginLoader pluginLoader) {
         this.novelPluginMap = novelPluginMap;
+        this.pluginLoader = pluginLoader;
     }
 
     public INovelPlugin getPlugin(String pluginName) {
@@ -21,7 +23,7 @@ public class PluginManager {
             // Get the first plugin if pluginName is null
             plugin = novelPluginMap.values().iterator().next();
         }
-        
+
         return plugin;
     }
 
