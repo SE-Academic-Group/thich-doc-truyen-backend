@@ -11,6 +11,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Component
 public class TangThuVien extends BaseCrawler {
@@ -31,7 +34,7 @@ public class TangThuVien extends BaseCrawler {
         //        Get ul child from div.book-img-text
         Elements lis = html.select("div.book-img-text ul li");
 
-        try{
+        try {
             for (Element li : lis) {
                 // Extract information
                 String title = li.selectFirst("div.book-mid-info h4 a").text();
@@ -44,7 +47,7 @@ public class TangThuVien extends BaseCrawler {
                 NovelSearchResult novelSearchResult = new NovelSearchResult(title, author, image, url, nChapter);
                 novelSearchResults.add(novelSearchResult);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             return novelSearchResults;
         }
 
@@ -108,7 +111,7 @@ public class TangThuVien extends BaseCrawler {
             //        Replace all nbsp with space
             title = title.replaceAll("\u00A0", " ");
             content = html.selectFirst(".box-chap").text();
-        }catch (Exception e){
+        } catch (Exception e) {
             throw HttpException.NOT_FOUND("NOT_FOUND", "Chapter not found");
         }
 
@@ -122,9 +125,9 @@ public class TangThuVien extends BaseCrawler {
         if (currentId == 1) {
             prevPage = null;
         } else {
-            prevPage = url.substring(0, url.lastIndexOf("-") + 1) + (currentId - 1);
+            prevPage = url.substring(0, url.lastIndexOf("/") + 1) + "chuong-" + (currentId - 1);
         }
-        nextPage = url.substring(0, url.lastIndexOf("-") + 1) + (currentId + 1);
+        nextPage = url.substring(0, url.lastIndexOf("/") + 1) + "chuong-" + (currentId + 1);
 
 
         ChapterDetail chapterDetail = new ChapterDetail(novelTitle, title, url, content);
@@ -161,23 +164,39 @@ public class TangThuVien extends BaseCrawler {
         Integer page = 0;
         Document html = getHtml(novelUrl);
         String storyId = html.selectFirst("input#story_id_hidden").attr("value");
-        String url = this.pluginUrl + "/doc-truyen/page/" + storyId + "?page=" + page + "&limit=75&web=1";
         Integer MaxPage = maxChapterListPage(html);
+
+        List<CompletableFuture<List<ChapterInfo>>> futures = new ArrayList<>();
+        ExecutorService executor = Executors.newFixedThreadPool(10);
         List<ChapterInfo> result = new ArrayList<>();
 
-        for(Integer i = 0; i <= MaxPage; i++){
+        for (Integer i = 0; i <= MaxPage; i++) {
             page = i;
             String urlPage = this.pluginUrl + "/doc-truyen/page/" + storyId + "?page=" + page + "&limit=75&web=1";
-            Document chapterListHtml = getHtml(urlPage);
-            List<ChapterInfo> chapterInfos = parseChapterListHTML(chapterListHtml);
 
-            result.addAll(chapterInfos);
+            CompletableFuture<List<ChapterInfo>> future = CompletableFuture.supplyAsync(() -> getHtml(urlPage), executor)
+                    .thenApply(this::parseChapterListHTML)
+                    .exceptionally(ex -> {
+                        ex.printStackTrace();
+                        return new ArrayList<ChapterInfo>();
+                    });
+
+            futures.add(future);
         }
 
+        List<List<ChapterInfo>> chapterInfos = futures.stream()
+                .map(CompletableFuture::join)
+                .toList();
+
+        for (List<ChapterInfo> chapterInfoList : chapterInfos) {
+            result.addAll(chapterInfoList);
+        }
+
+        executor.shutdown();
         return result;
     }
 
-    public Integer maxChapterListPage(Document html){
+    public Integer maxChapterListPage(Document html) {
         Elements paginationItems = html.select("ul.pagination li a");
 
         int lastLoadingNumber = -1;
@@ -225,18 +244,17 @@ public class TangThuVien extends BaseCrawler {
             int startIndex = title.indexOf("Chương") + "Chương".length() + 1;
             int endIndex = title.indexOf(":");
             String chapterIndex = "";
-            if (startIndex != -1 && endIndex != -1 && startIndex < endIndex){
+            if (startIndex != -1 && endIndex != -1 && startIndex < endIndex) {
                 chapterIndex = title.substring(startIndex, endIndex).trim();
-            }
-            else{
+            } else {
                 continue;
             }
 
-            if(chapterIndex.endsWith(" ")){
+            if (chapterIndex.endsWith(" ")) {
                 chapterIndex = chapterIndex.substring(0, chapterIndex.length() - 1);
             }
 
-            if(endIndex != -1 && endIndex < title.length() - 1){
+            if (endIndex != -1 && endIndex < title.length() - 1) {
                 title = title.split(":")[1].trim();
             }
 
