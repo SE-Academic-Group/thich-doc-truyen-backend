@@ -99,7 +99,7 @@ public class TruyenFull extends BaseApi {
                 //            String nextPageUrl = (String) links.get("next");
                 //            String prevPageUrl = (String) links.get("previous");
 
-                Integer startId = (currentPage - 1) * perPage + 1;
+                Integer startId = (currentPage - 1) * perPage;
                 for (Map<String, Object> data : dataList) {
                     ChapterInfo chapterInfo = new ChapterInfo();
                     chapterInfo.setTitle((String) data.get("title"));

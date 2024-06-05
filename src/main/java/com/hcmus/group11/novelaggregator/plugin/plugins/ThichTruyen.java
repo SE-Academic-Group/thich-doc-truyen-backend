@@ -173,7 +173,7 @@ public class ThichTruyen extends BaseCrawler {
         List<ChapterInfo> chapterInfos = new ArrayList<>();
         Elements chapterElements = html.select("div.tab-text ul li");
 
-        Integer chapterIndex = 1;
+        Integer chapterIndex = 0;
         for (Element chapterElement : chapterElements) {
             Element chapterInfoElement = chapterElement.selectFirst("a");
 
