@@ -8,9 +8,10 @@ import com.hcmus.group11.novelaggregator.type.*;
 import com.hcmus.group11.novelaggregator.util.RequestAttributeUtil;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
-
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Component
 public class TruyenFull extends BaseApi {
@@ -36,8 +37,7 @@ public class TruyenFull extends BaseApi {
 
             if (status.equals("error")) {
                 return null;
-            }
-            else {
+            } else {
                 chapterDetail.setNovelTitle((String) data.get("story_name"));
                 chapterDetail.setTitle((String) data.get("chapter_name"));
 
@@ -88,8 +88,7 @@ public class TruyenFull extends BaseApi {
 
             if (status.equals("error")) {
                 return null;
-            }
-            else {
+            } else {
                 Map<String, Object> meta = (Map<String, Object>) jsonMap.get("meta");
                 Map<String, Object> pagination = (Map<String, Object>) meta.get("pagination");
                 Map<String, Object> links = (Map<String, Object>) pagination.get("links");
@@ -138,8 +137,7 @@ public class TruyenFull extends BaseApi {
             String status = (String) jsonMap.get("status");
             if (status.equals("error")) {
                 return null;
-            }
-            else{
+            } else {
                 novelDetail.setTitle((String) data.get("title"));
                 novelDetail.setAuthor((String) data.get("author"));
                 novelDetail.setImage((String) data.get("image"));
@@ -246,50 +244,88 @@ public class TruyenFull extends BaseApi {
     public List<ChapterInfo> getFullChapterList(String url) {
         try {
             Integer currentPage = 1;
-            Integer maxPage = 1;
-            List<ChapterInfo> chapterList = new ArrayList<>();
 
-            while(currentPage <= maxPage) {
-                Integer page = currentPage;
+            // Get first page to get total pages
+            String firstChapterListUrl = buildChapterListUrlFromNovelDetailUrl(url, 1);
+            String firstJsonChapterListString = getJsonString(firstChapterListUrl);
+
+            Integer maxPage = getMaxPage(firstJsonChapterListString);
+            List<CompletableFuture<List<ChapterInfo>>> futures = new ArrayList<>();
+            ExecutorService executor = Executors.newFixedThreadPool(10);
+            List<ChapterInfo> result = new ArrayList<>();
+
+            // Add first page to result
+            result.addAll(parseChapterListJson(firstJsonChapterListString, 1, url));
+
+            // Use CompletableFuture to get all other pages concurrently
+            for (int i = 2; i <= maxPage; i++) {
+                int page = i;
                 String chapterListUrl = buildChapterListUrlFromNovelDetailUrl(url, page);
-                String jsonChapterListString = getJsonString(chapterListUrl);
-
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> jsonMap = objectMapper.readValue(jsonChapterListString, Map.class);
-                List<Map<String, Object>> dataList = (List<Map<String, Object>>) jsonMap.get("data");
-
-                String status = (String) jsonMap.get("status");
-                if (status.equals("error")) {
-                    throw HttpException.NOT_FOUND("NOT_FOUND", "No result found for novel url: " + url + " page: " + page);
-                }
-                else {
-
-                    Map<String, Object> meta = (Map<String, Object>) jsonMap.get("meta");
-                    Map<String, Object> pagination = (Map<String, Object>) meta.get("pagination");
-                    Map<String, Object> links = (Map<String, Object>) pagination.get("links");
-
-                    Integer perPage = (Integer) pagination.get("per_page");
-                    maxPage = (Integer) pagination.get("total_pages");
-
-                    Integer startId = (currentPage - 1) * perPage + 1;
-                    for (Map<String, Object> data : dataList) {
-                        ChapterInfo chapterInfo = new ChapterInfo();
-                        chapterInfo.setTitle((String) data.get("title"));
-                        chapterInfo.setUrl(buildChapterDetailUrl((Integer) data.get("id")));
-
-                        chapterInfo.setIndex(startId.toString());
-                        startId++;
-
-                        chapterList.add(chapterInfo);
-                    }
-
-                    currentPage++;
-                }
-
+                CompletableFuture<List<ChapterInfo>> future = CompletableFuture.supplyAsync(() -> getJsonString(chapterListUrl), executor).thenApply(json -> parseChapterListJson(json, page, url));
+                futures.add(future);
             }
-            return chapterList;
+
+            // Wait for all futures to complete
+            List<List<ChapterInfo>> chapterInfos = futures.stream()
+                    .map(CompletableFuture::join)
+                    .toList();
+
+            for (List<ChapterInfo> chapterInfoList : chapterInfos) {
+                result.addAll(chapterInfoList);
+            }
+
+            executor.shutdown();
+
+            return result;
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private List<ChapterInfo> parseChapterListJson(String json, Integer currentPage, String url) {
+        List<ChapterInfo> chapterList = new ArrayList<>();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> jsonMap = null;
+        try {
+            jsonMap = objectMapper.readValue(json, Map.class);
+        } catch (JsonProcessingException e) {
+            throw HttpException.NOT_FOUND("NOT_FOUND", "No result found for novel url: " + url + " page: " + currentPage);
+        }
+        List<Map<String, Object>> dataList = (List<Map<String, Object>>) jsonMap.get("data");
+
+        String status = (String) jsonMap.get("status");
+        if (status.equals("error")) {
+            throw HttpException.NOT_FOUND("NOT_FOUND", "No result found for novel url: " + url + " page: " + currentPage);
+        } else {
+
+            Map<String, Object> meta = (Map<String, Object>) jsonMap.get("meta");
+            Map<String, Object> pagination = (Map<String, Object>) meta.get("pagination");
+
+            Integer perPage = (Integer) pagination.get("per_page");
+
+            Integer startId = (currentPage - 1) * perPage + 1;
+            for (Map<String, Object> data : dataList) {
+                ChapterInfo chapterInfo = new ChapterInfo();
+                chapterInfo.setTitle((String) data.get("title"));
+                chapterInfo.setUrl(buildChapterDetailUrl((Integer) data.get("id")));
+
+                chapterInfo.setIndex(startId.toString());
+                startId++;
+
+                chapterList.add(chapterInfo);
+            }
+        }
+
+        return chapterList;
+    }
+
+    private Integer getMaxPage(String json) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> jsonMap = objectMapper.readValue(json, Map.class);
+        Map<String, Object> meta = (Map<String, Object>) jsonMap.get("meta");
+        Map<String, Object> pagination = (Map<String, Object>) meta.get("pagination");
+
+        return (Integer) pagination.get("total_pages");
     }
 }

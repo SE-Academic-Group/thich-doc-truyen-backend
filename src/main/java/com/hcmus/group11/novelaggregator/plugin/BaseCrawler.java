@@ -1,7 +1,10 @@
 package com.hcmus.group11.novelaggregator.plugin;
 
 import com.hcmus.group11.novelaggregator.exception.type.HttpException;
-import com.hcmus.group11.novelaggregator.type.*;
+import com.hcmus.group11.novelaggregator.type.ChapterDetail;
+import com.hcmus.group11.novelaggregator.type.NovelDetail;
+import com.hcmus.group11.novelaggregator.type.NovelSearchResult;
+import com.hcmus.group11.novelaggregator.type.ResponseMetadata;
 import com.hcmus.group11.novelaggregator.util.RequestAttributeUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,7 +14,6 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -30,7 +32,8 @@ public abstract class BaseCrawler implements INovelPlugin {
         Document html = getHtml(searchUrl);
 
         List<NovelSearchResult> novelSearchResults = parseSearchHTML(html);
-        if(novelSearchResults == null || novelSearchResults.isEmpty()) {
+//        Filter out the novels
+        if (novelSearchResults == null || novelSearchResults.isEmpty()) {
             throw HttpException.NOT_FOUND("NOT_FOUND", "No result found for keyword: " + keyword);
         }
         ResponseMetadata metadata = parseSearchMetadata(html);
@@ -54,7 +57,7 @@ public abstract class BaseCrawler implements INovelPlugin {
     }
 
     protected String encodedUrl(String url) {
-        try{
+        try {
             int queryIndex = url.indexOf("?");
             String query = "";
             if (queryIndex != -1) {
@@ -64,7 +67,7 @@ public abstract class BaseCrawler implements INovelPlugin {
 
             // Tìm vị trí dấu '/' đầu tiên sau phần "//" để tách base URL và path URL
             int indexOfSlash = url.indexOf("/", url.indexOf("//") + 2);
-            if(indexOfSlash == -1 || indexOfSlash == url.length() - 1)
+            if (indexOfSlash == -1 || indexOfSlash == url.length() - 1)
                 throw new RuntimeException("The URL redirects to the homepage.");
 
             // Tách phần base URL và path URL
@@ -89,7 +92,7 @@ public abstract class BaseCrawler implements INovelPlugin {
             Document doc = null;
             boolean redirected;
             String finalUrl = url;
-            do{
+            do {
                 String encodedUrl = encodedUrl(finalUrl);
 
                 // Thiết lập kết nối với các headers
@@ -103,11 +106,10 @@ public abstract class BaseCrawler implements INovelPlugin {
                 finalUrl = response.header("Location");
                 redirected = (finalUrl != null);
 
-                if(!redirected)
-                {
+                if (!redirected) {
                     doc = connection.get();
                 }
-            }while (redirected);
+            } while (redirected);
 
             return doc;
         } catch (Exception e) {
