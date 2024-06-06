@@ -113,8 +113,42 @@ public abstract class BaseCrawler implements INovelPlugin {
 
             return doc;
         } catch (Exception e) {
-            throw HttpException.NOT_FOUND("NOT_FOUND", e.getMessage());
+            // Check if is 503 error
+            if (e instanceof org.jsoup.HttpStatusException httpStatusException) {
+                switch (httpStatusException.getStatusCode()) {
+                    case 503:
+                        throw HttpException.SERVICE_UNAVAILABLE("SERVICE_UNAVAILABLE", "Service is temporarily unavailable");
+                    case 404:
+                        throw HttpException.NOT_FOUND("NOT_FOUND", "No result found for url: " + url);
+                    default:
+                        throw HttpException.BAD_REQUEST("BAD_REQUEST", "Bad request to url: " + url, e);
+                }
+            } else {
+                throw HttpException.BAD_REQUEST("BAD_REQUEST", "Bad request to url: " + url, e);
+            }
         }
+    }
+
+    protected Document getHtmlWithRetry(String url, int maxRetries, int retryDelay) {
+        int attempt = 0;
+        while (attempt < maxRetries) {
+            try {
+                return getHtml(url);
+            } catch (HttpException e) {
+                if (e.getStatusCode().is5xxServerError()) {
+                    attempt++;
+                    try {
+                        Thread.sleep(retryDelay);
+                    } catch (InterruptedException ie) {
+                        throw new RuntimeException(ie);
+                    }
+                    retryDelay *= 2; // Exponential backoff
+                } else {
+                    throw e;
+                }
+            }
+        }
+        throw HttpException.SERVICE_UNAVAILABLE("SERVICE_UNAVAILABLE", "Service is temporarily unavailable");
     }
 
     protected abstract String buildSearchUrl(String keyword, Integer page);

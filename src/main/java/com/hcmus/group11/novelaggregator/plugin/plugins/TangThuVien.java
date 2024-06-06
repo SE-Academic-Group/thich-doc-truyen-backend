@@ -171,10 +171,20 @@ public class TangThuVien extends BaseCrawler {
         List<ChapterInfo> result = new ArrayList<>();
 
         for (Integer i = 0; i <= MaxPage; i++) {
+            // Set waiting time for each page
             page = i;
+            int delay = 100 * i;
             String urlPage = this.pluginUrl + "/doc-truyen/page/" + storyId + "?page=" + page + "&limit=75&web=1";
 
-            CompletableFuture<List<ChapterInfo>> future = CompletableFuture.supplyAsync(() -> getHtml(urlPage), executor)
+            CompletableFuture<List<ChapterInfo>> future = CompletableFuture.supplyAsync(() -> {
+                        try {
+                            Thread.sleep(delay);
+                            return getHtmlWithRetry(urlPage, 3, 1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                            return null;
+                        }
+                    }, executor)
                     .thenApply(this::parseChapterListHTML)
                     .exceptionally(ex -> {
                         ex.printStackTrace();
