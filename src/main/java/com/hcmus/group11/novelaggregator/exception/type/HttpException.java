@@ -1,6 +1,5 @@
 package com.hcmus.group11.novelaggregator.exception.type;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.http.HttpStatus;
@@ -78,6 +77,18 @@ public class HttpException extends ResponseStatusException {
 
     public static HttpException FORBIDDEN(String errorCode, String reason) {
         HttpException ex = new HttpException(HttpStatus.FORBIDDEN, reason);
+        ex.setErrorCode(errorCode);
+        return ex;
+    }
+
+    public static HttpException SERVICE_UNAVAILABLE(String errorCode, String reason, Throwable cause) {
+        HttpException ex = new HttpException(HttpStatus.SERVICE_UNAVAILABLE, reason, cause);
+        ex.setErrorCode(errorCode);
+        return ex;
+    }
+
+    public static HttpException SERVICE_UNAVAILABLE(String errorCode, String reason) {
+        HttpException ex = new HttpException(HttpStatus.SERVICE_UNAVAILABLE, reason);
         ex.setErrorCode(errorCode);
         return ex;
     }
