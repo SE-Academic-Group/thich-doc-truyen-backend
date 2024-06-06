@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.constraints.Min;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -50,8 +51,7 @@ public class NovelController {
 
     @Operation(summary = "Get novel detail",
             parameters = {
-                    @Parameter(name = "url", description = "URL of the novel", required = true, example = "http://example.com/novel"),
-                    @Parameter(name = "pluginName", description = "Name of the plugin to use for getting novel detail", required = true, example = "truyenFull")
+                    @Parameter(name = "url", description = "URL of the novel", required = true, example = "http://example.com/novel")
             },
             responses = {
                     @ApiResponse(description = "Details of the novel",
@@ -65,16 +65,15 @@ public class NovelController {
                             content = @Content(schema = @Schema(implementation = TransformedHttpException.class)))
             }
     )
-    @GetMapping("/{pluginName}/novel-detail")
-    public NovelDetail getNovelDetail(@RequestParam() String url, @PathVariable() String pluginName) {
-        return novelService.getNovelDetail(url, pluginName);
+    @GetMapping("/novel-detail")
+    public NovelDetail getNovelDetail(@RequestParam() String url) {
+        return novelService.getNovelDetail(url);
     }
 
     @Operation(summary = "Get chapter list",
             parameters = {
                     @Parameter(name = "url", description = "URL of the novel", required = true, example = "http://example.com/novel"),
-                    @Parameter(name = "page", description = "Page number for pagination", required = false, example = "1"),
-                    @Parameter(name = "pluginName", description = "Name of the plugin to use for getting chapter list", required = true, example = "truyenFull")
+                    @Parameter(name = "page", description = "Page number for pagination", required = false, example = "1")
             },
             responses = {
                     @ApiResponse(description = "List of chapters",
@@ -88,12 +87,12 @@ public class NovelController {
                             content = @Content(schema = @Schema(implementation = TransformedHttpException.class)))
             }
     )
-    @GetMapping("/{pluginName}/chapter-list")
-    public List<ChapterInfo> getChapterList(@RequestParam() String url, @RequestParam(required = false) Integer page, @PathVariable() String pluginName) {
+    @GetMapping("/chapter-list")
+    public List<ChapterInfo> getChapterList(@RequestParam() String url, @RequestParam(required = false) Integer page) {
         if (page == null) {
             page = 1;
         }
-        return novelService.getChapterList(url, page, pluginName);
+        return novelService.getChapterList(url, page);
     }
 
     @Operation(summary = "Get plugin list",
@@ -113,8 +112,7 @@ public class NovelController {
     @Operation(summary = "Get chapter detail",
             parameters = {
                     @Parameter(name = "novelUrl", description = "URL of the novel", required = true, example = "http://example.com/novel"),
-                    @Parameter(name = "chapterUrl", description = "URL of the chapter", required = true, example = "http://example.com/chapter"),
-                    @Parameter(name = "pluginName", description = "Name of the plugin to use for getting chapter detail", required = true, example = "truyenFull")
+                    @Parameter(name = "chapterUrl", description = "URL of the chapter", required = true, example = "http://example.com/chapter")
             },
             responses = {
                     @ApiResponse(description = "Details of the chapter",
@@ -128,15 +126,14 @@ public class NovelController {
                             content = @Content(schema = @Schema(implementation = TransformedHttpException.class)))
             }
     )
-    @GetMapping("/{pluginName}/chapter-detail")
-    public Object getChapterDetail(@RequestParam() String chapterUrl, @RequestParam String novelUrl, @PathVariable() String pluginName) {
-        return novelService.getChapterDetail(chapterUrl, pluginName);
+    @GetMapping("/chapter-detail")
+    public Object getChapterDetail(@RequestParam() String chapterUrl, @RequestParam String novelUrl) {
+        return novelService.getChapterDetail(chapterUrl);
     }
 
     @Operation(summary = "Get full chapter list",
             parameters = {
-                    @Parameter(name = "url", description = "URL of the novel", required = true, example = "http://example.com/novel"),
-                    @Parameter(name = "pluginName", description = "Name of the plugin to use for getting full chapter list", required = true, example = "truyenFull")
+                    @Parameter(name = "url", description = "URL of the novel", required = true, example = "http://example.com/novel")
             },
             responses = {
                     @ApiResponse(description = "List of all chapters",
@@ -150,8 +147,8 @@ public class NovelController {
                             content = @Content(schema = @Schema(implementation = TransformedHttpException.class)))
             }
     )
-    @GetMapping("/{pluginName}/full-chapter-list")
-    public Object getFullChapterList(@RequestParam() String url, @PathVariable() String pluginName) {
-        return novelService.getFullChapterList(url, pluginName);
+    @GetMapping("/full-chapter-list")
+    public Object getFullChapterList(@RequestParam() String url) {
+        return novelService.getFullChapterList(url);
     }
 }

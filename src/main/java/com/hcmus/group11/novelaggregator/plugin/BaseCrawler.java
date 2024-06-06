@@ -1,6 +1,10 @@
 package com.hcmus.group11.novelaggregator.plugin;
 
-import com.hcmus.group11.novelaggregator.type.*;
+import com.hcmus.group11.novelaggregator.exception.type.HttpException;
+import com.hcmus.group11.novelaggregator.type.ChapterDetail;
+import com.hcmus.group11.novelaggregator.type.NovelDetail;
+import com.hcmus.group11.novelaggregator.type.NovelSearchResult;
+import com.hcmus.group11.novelaggregator.type.ResponseMetadata;
 import com.hcmus.group11.novelaggregator.util.RequestAttributeUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,7 +14,6 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -29,6 +32,10 @@ public abstract class BaseCrawler implements INovelPlugin {
         Document html = getHtml(searchUrl);
 
         List<NovelSearchResult> novelSearchResults = parseSearchHTML(html);
+//        Filter out the novels
+        if (novelSearchResults == null || novelSearchResults.isEmpty()) {
+            throw HttpException.NOT_FOUND("NOT_FOUND", "No result found for keyword: " + keyword);
+        }
         ResponseMetadata metadata = parseSearchMetadata(html);
         metadata.addMetadataValue("currentPage", page);
         metadata.addMetadataValue("name", pluginName);
@@ -50,7 +57,7 @@ public abstract class BaseCrawler implements INovelPlugin {
     }
 
     protected String encodedUrl(String url) {
-        try{
+        try {
             int queryIndex = url.indexOf("?");
             String query = "";
             if (queryIndex != -1) {
@@ -60,6 +67,8 @@ public abstract class BaseCrawler implements INovelPlugin {
 
             // Tìm vị trí dấu '/' đầu tiên sau phần "//" để tách base URL và path URL
             int indexOfSlash = url.indexOf("/", url.indexOf("//") + 2);
+            if (indexOfSlash == -1 || indexOfSlash == url.length() - 1)
+                throw new RuntimeException("The URL redirects to the homepage.");
 
             // Tách phần base URL và path URL
             String baseUrl = url.substring(0, indexOfSlash);
@@ -74,8 +83,7 @@ public abstract class BaseCrawler implements INovelPlugin {
 
             return encodedUrl;
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException(e.getMessage());
         }
     }
 
@@ -84,7 +92,7 @@ public abstract class BaseCrawler implements INovelPlugin {
             Document doc = null;
             boolean redirected;
             String finalUrl = url;
-            do{
+            do {
                 String encodedUrl = encodedUrl(finalUrl);
 
                 // Thiết lập kết nối với các headers
@@ -98,17 +106,49 @@ public abstract class BaseCrawler implements INovelPlugin {
                 finalUrl = response.header("Location");
                 redirected = (finalUrl != null);
 
-                if(!redirected)
-                {
+                if (!redirected) {
                     doc = connection.get();
                 }
-            }while (redirected);
+            } while (redirected);
 
             return doc;
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            // Check if is 503 error
+            if (e instanceof org.jsoup.HttpStatusException httpStatusException) {
+                switch (httpStatusException.getStatusCode()) {
+                    case 503:
+                        throw HttpException.SERVICE_UNAVAILABLE("SERVICE_UNAVAILABLE", "Service is temporarily unavailable");
+                    case 404:
+                        throw HttpException.NOT_FOUND("NOT_FOUND", "No result found for url: " + url);
+                    default:
+                        throw HttpException.BAD_REQUEST("BAD_REQUEST", "Bad request to url: " + url, e);
+                }
+            } else {
+                throw HttpException.BAD_REQUEST("BAD_REQUEST", "Bad request to url: " + url, e);
+            }
         }
+    }
+
+    protected Document getHtmlWithRetry(String url, int maxRetries, int retryDelay) {
+        int attempt = 0;
+        while (attempt < maxRetries) {
+            try {
+                return getHtml(url);
+            } catch (HttpException e) {
+                if (e.getStatusCode().is5xxServerError()) {
+                    attempt++;
+                    try {
+                        Thread.sleep(retryDelay);
+                    } catch (InterruptedException ie) {
+                        throw new RuntimeException(ie);
+                    }
+                    retryDelay *= 2; // Exponential backoff
+                } else {
+                    throw e;
+                }
+            }
+        }
+        throw HttpException.SERVICE_UNAVAILABLE("SERVICE_UNAVAILABLE", "Service is temporarily unavailable");
     }
 
     protected abstract String buildSearchUrl(String keyword, Integer page);

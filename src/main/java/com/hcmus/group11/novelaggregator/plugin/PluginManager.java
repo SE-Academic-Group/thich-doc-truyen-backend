@@ -1,8 +1,11 @@
 package com.hcmus.group11.novelaggregator.plugin;
 
+import com.hcmus.group11.novelaggregator.exception.type.HttpException;
 import com.hcmus.group11.novelaggregator.type.PluginMetadata;
 import org.springframework.stereotype.Service;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,8 +23,9 @@ public class PluginManager {
     public INovelPlugin getPlugin(String pluginName) {
         INovelPlugin plugin = novelPluginMap.get(pluginName);
         if (plugin == null) {
-            // Get the first plugin if pluginName is null
-            plugin = novelPluginMap.values().iterator().next();
+//            // Get the first plugin if pluginName is null
+//            plugin = novelPluginMap.values().iterator().next();
+            throw HttpException.NOT_FOUND("NOT_FOUND", "Plugin not found: " + pluginName);
         }
 
         return plugin;
@@ -37,5 +41,26 @@ public class PluginManager {
         }
 
         return pluginMetadataList;
+    }
+
+    public INovelPlugin getPluginByNovelUrl(String url){
+        try {
+            URL detailUrl = new URL(url);
+            String baseUrl = detailUrl.getProtocol() + "://" + detailUrl.getHost();
+            baseUrl = baseUrl.toLowerCase();
+
+            for (INovelPlugin plugin : novelPluginMap.values()) {
+                String pluginName = plugin.getPluginName().toLowerCase();
+                if (baseUrl.contains(pluginName)) {
+                    return plugin;
+                }
+            }
+
+            throw HttpException.NOT_FOUND("NOT_FOUND", "Plugin not found for url: " + url);
+
+        }catch (MalformedURLException e){
+            throw new RuntimeException(e.getMessage());
+        }
+
     }
 }

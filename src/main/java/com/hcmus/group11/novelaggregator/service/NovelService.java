@@ -20,13 +20,13 @@ public class NovelService {
         return plugin.search(keyword, page);
     }
 
-    public NovelDetail getNovelDetail(String url, String pluginName) {
-        INovelPlugin plugin = pluginManager.getPlugin(pluginName);
+    public NovelDetail getNovelDetail(String url) {
+        INovelPlugin plugin = pluginManager.getPluginByNovelUrl(url);
         return plugin.getNovelDetail(url);
     }
 
-    public List<ChapterInfo> getChapterList(String url, Integer page, String pluginName) {
-        INovelPlugin plugin = pluginManager.getPlugin(pluginName);
+    public List<ChapterInfo> getChapterList(String url, Integer page) {
+        INovelPlugin plugin = pluginManager.getPluginByNovelUrl(url);
         return plugin.getChapterList(url, page);
     }
 
@@ -34,13 +34,13 @@ public class NovelService {
         return pluginManager.getPluginMetadataList();
     }
 
-    public ChapterDetail getChapterDetail(String url, String pluginName) {
-        INovelPlugin plugin = pluginManager.getPlugin(pluginName);
+    public ChapterDetail getChapterDetail(String url) {
+        INovelPlugin plugin = pluginManager.getPluginByNovelUrl(url);
         return plugin.getChapterDetail(url);
     }
 
-    public List<ChapterInfo> getFullChapterList(String url, String pluginName) {
-        INovelPlugin plugin = pluginManager.getPlugin(pluginName);
+    public List<ChapterInfo> getFullChapterList(String url) {
+        INovelPlugin plugin = pluginManager.getPluginByNovelUrl(url);
         return plugin.getFullChapterList(url);
     }
 }
