@@ -5,9 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hcmus.group11.novelaggregator.exception.type.HttpException;
 import com.hcmus.group11.novelaggregator.plugin.BaseApi;
 import com.hcmus.group11.novelaggregator.type.*;
+import com.hcmus.group11.novelaggregator.util.LevenshteinDistance;
 import com.hcmus.group11.novelaggregator.util.RequestAttributeUtil;
 import org.springframework.stereotype.Component;
 
+import java.text.Normalizer;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -281,6 +283,24 @@ public class TruyenFull extends BaseApi {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public String normalizeString(String str, Boolean isSpace) {
+        str = Normalizer.normalize(str, Normalizer.Form.NFD);
+        str = str.replaceAll("\\p{M}", ""); // Loại bỏ các dấu
+
+        // Bước 4: Chuyển về chữ thường và loại bỏ các ký tự đặc biệt, chỉ giữ lại chữ cái và số
+        str = str.toLowerCase().replaceAll("đ", "d");
+
+        if (isSpace) {
+            str = str.replaceAll("[^a-z0-9 ]", "");
+        } else {
+            str = str.replaceAll("[^a-z0-9]", "");
+        }
+
+        return str;
+    }
+
 
     private List<ChapterInfo> parseChapterListJson(String json, Integer currentPage, String url) {
         List<ChapterInfo> chapterList = new ArrayList<>();

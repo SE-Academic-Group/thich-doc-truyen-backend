@@ -9,6 +9,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -294,5 +295,28 @@ public class TangThuVien extends BaseCrawler {
         responseMetadata.addMetadataValue("pageArray", pageArray);
         responseMetadata.addMetadataValue("maxPage", maxPage);
         return responseMetadata;
+    }
+
+    @Override
+    public String normalizeString(String str, Boolean isSpace) {
+
+        // Bước 1: Loại bỏ các ký tự trong cặp dấu () hoặc [] ở đầu chuỗi
+        str = str.replaceAll("^[\\[(].*?[\\])]\\s*", "");
+
+        // Bước 2: Loại bỏ các ký tự Trung Quốc phía sau
+        str = str.replaceAll("\\s*-\\s*[\\u4e00-\\u9fff]+.*$", "");
+
+        str = Normalizer.normalize(str, Normalizer.Form.NFD);
+        str = str.replaceAll("\\p{M}", ""); // Loại bỏ các dấu
+
+        // Bước 4: Chuyển về chữ thường và loại bỏ các ký tự đặc biệt, chỉ giữ lại chữ cái và số
+        str = str.toLowerCase().replaceAll("đ", "d");
+        if (isSpace) {
+            str = str.replaceAll("[^a-z0-9 ]", "");
+        } else {
+            str = str.replaceAll("[^a-z0-9]", "");
+        }
+
+        return str;
     }
 }
