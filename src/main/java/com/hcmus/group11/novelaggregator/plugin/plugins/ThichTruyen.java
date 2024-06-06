@@ -10,6 +10,7 @@ import org.jsoup.select.Elements;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,11 +58,11 @@ public class ThichTruyen extends BaseCrawler {
         String title = html.selectFirst("h1.story-intro-title").text();
         String author = html.selectFirst("p.story-intro-author a").text();
         String image = pluginUrl + "/" + html.selectFirst("div.story-intro-image img").attr("src");
-        String url = html.baseUri() +  html.selectFirst("h1.story-intro-title a").attr("href");
+        String url = html.baseUri() + html.selectFirst("h1.story-intro-title a").attr("href");
         String nChapterText = html.selectFirst("p.story-intro-chapper").text().replaceAll("[^0-9]", "");
         Integer nChapter = Integer.parseInt(nChapterText);
         String description = html.selectFirst("div#tab-over div.tab-text p").text();
-        if(description.equals("Đọc Truyện")){
+        if (description.equals("Đọc Truyện")) {
             description = html.selectFirst("div#tab-over div.tab-text").text();
         }
 
@@ -96,7 +97,7 @@ public class ThichTruyen extends BaseCrawler {
         String currentPageString = html.selectFirst("div.pagination strong").text();
         Integer currentPage = Integer.parseInt(currentPageString);
 
-        if(currentPage > maxPage) {
+        if (currentPage > maxPage) {
             maxPage = currentPage;
         }
 
@@ -118,21 +119,19 @@ public class ThichTruyen extends BaseCrawler {
         String content = html.selectFirst("div.story-detail-content").text();
         content = content.replaceAll("(?i)<br\\s*/?>", "");
 
-        ChapterDetail chapterDetail = new ChapterDetail(novelTitle,title, url, content);
+        ChapterDetail chapterDetail = new ChapterDetail(novelTitle, title, url, content);
 
         String nextChapter = html.selectFirst("div.next-previous a").attr("href");
-        if(nextChapter.contains("javascript")){
+        if (nextChapter.contains("javascript")) {
             nextChapter = null;
-        }
-        else{
+        } else {
             nextChapter = this.pluginUrl + "/" + nextChapter;
         }
 
         String previousChapter = html.selectFirst("div.prev-previous a").attr("href");
-        if(previousChapter.contains("javascript")){
+        if (previousChapter.contains("javascript")) {
             previousChapter = null;
-        }
-        else{
+        } else {
             previousChapter = this.pluginUrl + "/" + previousChapter;
         }
 
@@ -207,5 +206,22 @@ public class ThichTruyen extends BaseCrawler {
         responseMetadata.addMetadataValue("pageArray", pageArray);
         responseMetadata.addMetadataValue("maxPage", maxPage);
         return responseMetadata;
+    }
+
+    @Override
+    public String normalizeString(String str, Boolean isSpace) {
+        str = Normalizer.normalize(str, Normalizer.Form.NFD);
+        str = str.replaceAll("\\p{M}", ""); // Loại bỏ các dấu
+
+        // Bước 4: Chuyển về chữ thường và loại bỏ các ký tự đặc biệt, chỉ giữ lại chữ cái và số
+        str = str.toLowerCase().replaceAll("đ", "d");
+
+        if (isSpace) {
+            str = str.replaceAll("[^a-z0-9 ]", "");
+        } else {
+            str = str.replaceAll("[^a-z0-9]", "");
+        }
+
+        return str;
     }
 }

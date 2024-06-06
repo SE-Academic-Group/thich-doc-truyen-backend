@@ -151,4 +151,26 @@ public class NovelController {
     public Object getFullChapterList(@RequestParam() String url) {
         return novelService.getFullChapterList(url);
     }
+
+    @Operation(summary = "Switch plugin metadata",
+            parameters = {
+                    @Parameter(name = "noveUrl", description = "URL of the novel", required = true, example = "http://example.com/novel"),
+                    @Parameter(name = "chapterIndex", description = "Index of the chapter", required = true, example = "1")
+            },
+            responses = {
+                    @ApiResponse(description = "Chapter Information of each plugin",
+                            responseCode = "200",
+                            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ChapterInfo.class)))),
+                    @ApiResponse(responseCode = "400", description = "Invalid URL",
+                            content = @Content(schema = @Schema(implementation = TransformedHttpException.class))),
+                    @ApiResponse(responseCode = "404", description = "Not Found",
+                            content = @Content(schema = @Schema(implementation = TransformedHttpException.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error",
+                            content = @Content(schema = @Schema(implementation = TransformedHttpException.class)))
+            }
+    )
+    @GetMapping("/switch-plugin")
+    public List<SwitchPluginMetaData> getSwitchPluginMetaData(@RequestParam() String chapterIndex, @RequestParam String novelUrl) {
+        return novelService.getSwitchPluginMetaData(chapterIndex, novelUrl);
+    }
 }
