@@ -7,6 +7,7 @@ import com.hcmus.group11.novelaggregator.exception.type.HttpException;
 import com.hcmus.group11.novelaggregator.plugin.BaseCrawler;
 import com.hcmus.group11.novelaggregator.type.*;
 import com.hcmus.group11.novelaggregator.util.RequestAttributeUtil;
+import com.hcmus.group11.novelaggregator.util.UnicodeRemover;
 import com.ironsoftware.ironpdf.License;
 import com.ironsoftware.ironpdf.PdfDocument;
 import com.ironsoftware.ironpdf.Settings;
@@ -18,6 +19,7 @@ import nl.siegmann.epublib.epub.EpubWriter;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -39,6 +41,7 @@ import java.util.zip.ZipOutputStream;
 @Component
 public class ThichTruyen extends BaseCrawler {
 
+    String licenseKey = "IRONSU ITE.PHUOCNHANTRANONE.GMAIL.COM.19627-FC5FEE9C2D-INXGX-VYU7MHFUBMGB-ED3PKWHT3AMU-UTUZKSBPC72L-CX5JGC3TRI7V-S2AI7AMHQ7JT-DZL6THKRKTWV-5DP5YB-T2HOSDH6JXCMUA-DEPLOYMENT.TRIAL-5ESGQZ.TRIAL.EXPIRES.04.JUL.2024";
     public ThichTruyen() {
         pluginName = "thichTruyen";
         pluginUrl = "https://thichtruyen.vn";
@@ -287,7 +290,7 @@ public class ThichTruyen extends BaseCrawler {
             ByteArrayInputStream htmlInputStream = new ByteArrayInputStream(htmlContent.getBytes(StandardCharsets.UTF_8));
 //            FileInputStream htmlInputStream = new FileInputStream(htmlInputStream);
             Resource htmlResource = new Resource(htmlInputStream, "file.html");
-            String epubFilePath = "book.epub";
+            String epubFilePath = UnicodeRemover.removeUnicode(chapterName.text()) + ".epub";
             book.addSection(chapterName.text(), htmlResource);
 
             // Write the book to an EPUB file
@@ -346,16 +349,15 @@ public class ThichTruyen extends BaseCrawler {
                 authorName + "\n" +
                 storyDetailContent.html();
 
-        License.setLicenseKey("IRONSU ITE.PHUOCNHANTRANONE.GMAIL.COM.19627-FC5FEE9C2D-INXGX-VYU7MHFUBMGB-ED3PKWHT3AMU-UTUZKSBPC72L-CX5JGC3TRI7V-S2AI7AMHQ7JT-DZL6THKRKTWV-5DP5YB-T2HOSDH6JXCMUA-DEPLOYMENT.TRIAL-5ESGQZ.TRIAL.EXPIRES.04.JUL.2024");
+        License.setLicenseKey(licenseKey);
 
         Settings.setLogPath(Paths.get("C:/tmp/IronPdfEngine.log"));
 
         PdfDocument myPdf = PdfDocument.renderHtmlAsPdf(res);
 
-        myPdf.saveAs(Paths.get("novel.pdf"));
-
-        String pdfFilePath = "novel.pdf";
-        File pdfFile = new File("novel.pdf");
+        String pdfFilePath = UnicodeRemover.removeUnicode(chapterName.text()) + ".pdf";
+        myPdf.saveAs(Paths.get(pdfFilePath));
+        File pdfFile = new File(pdfFilePath);
 
         try {
             InputStreamResource resource = new InputStreamResource(new FileInputStream(pdfFilePath));
@@ -426,15 +428,14 @@ public class ThichTruyen extends BaseCrawler {
             // Thực hiện các thao tác cần thiết trên tài liệu
             for (int page = 0; page < doc.getPageCount(); page++) {
                 com.aspose.words.Document extractedPage = doc.extractPages(page, 1);
-                extractedPage.save(String.format("page_%d.png", page + 1), SaveFormat.PNG);
+                extractedPage.save(String.format(UnicodeRemover.removeUnicode(chapterName.text()) + "_%d.png", page + 1), SaveFormat.PNG);
             }
 
-
             // Create a zip file containing the images
-            String zipFilePath = "novel_images.zip";
+            String zipFilePath = UnicodeRemover.removeUnicode(chapterName.text()) + ".zip";
             try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFilePath))) {
                 for (int page = 0; page < doc.getPageCount(); page++) {
-                    String imagePath = String.format("page_%d.png", page + 1);
+                    String imagePath = String.format(UnicodeRemover.removeUnicode(chapterName.text()) + "_%d.png", page + 1);
                     zos.putNextEntry(new ZipEntry(imagePath));
                     try (InputStream is = new FileInputStream(imagePath)) {
                         StreamUtils.copy(is, zos);
@@ -461,7 +462,7 @@ public class ThichTruyen extends BaseCrawler {
 
             // Delete the images and the zip file after sending the response
             for (int page = 0; page < doc.getPageCount(); page++) {
-                Files.deleteIfExists(Paths.get(String.format("page_%d.png", page + 1)));
+                Files.deleteIfExists(Paths.get(String.format(UnicodeRemover.removeUnicode(chapterName.text()) + "_%d.png", page + 1)));
             }
             Files.deleteIfExists(Paths.get(zipFilePath));
             File trashFile1 = new File("input.001.png");
