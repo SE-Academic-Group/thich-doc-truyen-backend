@@ -11,6 +11,7 @@ import com.hcmus.group11.novelaggregator.plugin.BaseApi;
 import com.hcmus.group11.novelaggregator.type.*;
 import com.hcmus.group11.novelaggregator.util.LevenshteinDistance;
 import com.hcmus.group11.novelaggregator.util.RequestAttributeUtil;
+import com.hcmus.group11.novelaggregator.util.UnicodeRemover;
 import com.ironsoftware.ironpdf.License;
 import com.ironsoftware.ironpdf.PdfDocument;
 import com.ironsoftware.ironpdf.Settings;
@@ -40,6 +41,7 @@ import java.util.zip.ZipOutputStream;
 @Component
 public class TruyenFull extends BaseApi {
 
+    String licenseKey = "IRONSU ITE.PHUOCNHANTRANONE.GMAIL.COM.19627-FC5FEE9C2D-INXGX-VYU7MHFUBMGB-ED3PKWHT3AMU-UTUZKSBPC72L-CX5JGC3TRI7V-S2AI7AMHQ7JT-DZL6THKRKTWV-5DP5YB-T2HOSDH6JXCMUA-DEPLOYMENT.TRIAL-5ESGQZ.TRIAL.EXPIRES.04.JUL.2024";
     public TruyenFull() {
         this.pluginName = "truyenFull";
         this.pluginUrl = "https://truyenfull.vn";
@@ -390,30 +392,28 @@ public class TruyenFull extends BaseApi {
                 System.out.println((String) data.get("chapter_name"));
                 System.out.println((String) data.get("content"));
 
-                String story_name = "<h1>" + (String) data.get("story_name") + "</h1>";
-                String chapter_name = "<h2>" + (String) data.get("chapter_name") + "</h2>";
+                String story_name =  (String) data.get("story_name");
+                String chapter_name = (String) data.get("chapter_name");
                 String storyDetailContent = (String) data.get("content");
 
                 String res = "<!DOCTYPE html>\n" +
                         "<html>\n" +
                         "<head></head>\n" +
                         "<body>\n" +
-                        story_name + "\n" +
-                        chapter_name + "\n" +
+                        "<h1>" + story_name + "</h1>" +
+                        "<h2>" + chapter_name + "</h2>" +
                         "<p>----------------</p>" +
                         storyDetailContent +
                         "</body>\n" +
                         "</html>";
-                License.setLicenseKey("IRONSU ITE.PHUOCNHANTRANONE.GMAIL.COM.19627-FC5FEE9C2D-INXGX-VYU7MHFUBMGB-ED3PKWHT3AMU-UTUZKSBPC72L-CX5JGC3TRI7V-S2AI7AMHQ7JT-DZL6THKRKTWV-5DP5YB-T2HOSDH6JXCMUA-DEPLOYMENT.TRIAL-5ESGQZ.TRIAL.EXPIRES.04.JUL.2024");
+                License.setLicenseKey(licenseKey);
 
                 Settings.setLogPath(Paths.get("C:/tmp/IronPdfEngine.log"));
 
                 PdfDocument myPdf = PdfDocument.renderHtmlAsPdf(res);
-
-                myPdf.saveAs(Paths.get("novel.pdf"));
-
-                String pdfFilePath = "novel.pdf";
-                File pdfFile = new File("novel.pdf");
+                String pdfFilePath = UnicodeRemover.removeUnicode(chapter_name) + ".pdf";
+                myPdf.saveAs(Paths.get(pdfFilePath));
+                File pdfFile = new File(pdfFilePath);
 
                 InputStreamResource resource = new InputStreamResource(new FileInputStream(pdfFilePath));
 
@@ -474,7 +474,7 @@ public class TruyenFull extends BaseApi {
                 metadata.addTitle(story_name);
                 ByteArrayInputStream htmlInputStream = new ByteArrayInputStream(htmlContent.getBytes(StandardCharsets.UTF_8));
                 Resource htmlResource = new Resource(htmlInputStream, "file.html");
-                String epubFilePath = "book.epub";
+                String epubFilePath = UnicodeRemover.removeUnicode(chapter_name) + ".epub";
                 book.addSection(chapter_name, htmlResource);
 
                 // Write the book to an EPUB file
@@ -559,15 +559,15 @@ public class TruyenFull extends BaseApi {
                 // Thực hiện các thao tác cần thiết trên tài liệu
                 for (int page = 0; page < doc.getPageCount(); page++) {
                     com.aspose.words.Document extractedPage = doc.extractPages(page, 1);
-                    extractedPage.save(String.format("page_%d.png", page + 1), SaveFormat.PNG);
+                    extractedPage.save(String.format(UnicodeRemover.removeUnicode(chapter_name) + "_%d.png", page + 1), SaveFormat.PNG);
                 }
 
 
                 // Create a zip file containing the images
-                String zipFilePath = "novel_images.zip";
+                String zipFilePath = UnicodeRemover.removeUnicode(chapter_name) + ".zip";
                 try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFilePath))) {
                     for (int page = 0; page < doc.getPageCount(); page++) {
-                        String imagePath = String.format("page_%d.png", page + 1);
+                        String imagePath = String.format(UnicodeRemover.removeUnicode(chapter_name) + "_%d.png", page + 1);
                         zos.putNextEntry(new ZipEntry(imagePath));
                         try (InputStream is = new FileInputStream(imagePath)) {
                             StreamUtils.copy(is, zos);
@@ -594,7 +594,7 @@ public class TruyenFull extends BaseApi {
 
                 // Delete the images and the zip file after sending the response
                 for (int page = 0; page < doc.getPageCount(); page++) {
-                    Files.deleteIfExists(Paths.get(String.format("page_%d.png", page + 1)));
+                    Files.deleteIfExists(Paths.get(String.format(UnicodeRemover.removeUnicode(chapter_name) + "_%d.png", page + 1)));
                 }
                 Files.deleteIfExists(Paths.get(zipFilePath));
                 File trashFile1 = new File("input.001.png");
