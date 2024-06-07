@@ -5,6 +5,7 @@ import com.hcmus.group11.novelaggregator.plugin.PluginManager;
 import com.hcmus.group11.novelaggregator.type.*;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -96,4 +97,20 @@ public class NovelService {
 
         return switchPluginMetaDataList;
     }
+
+    public Object convertHtmlToEpub(String url) throws IOException {
+        INovelPlugin plugin = pluginManager.getPluginByNovelUrl(url);
+        return plugin.convertHtmlToEpub(url);
+    }
+
+    public Object convertHtmlToPdf(String url) throws IOException {
+        INovelPlugin plugin = pluginManager.getPluginByNovelUrl(url);
+        return plugin.convertHtmlToPdf(url);
+    }
+
+    public Object convertHtmlToImg(String url) throws Exception {
+        INovelPlugin plugin = pluginManager.getPluginByNovelUrl(url);
+        return plugin.convertHtmlToImg(url);
+    }
+
 }

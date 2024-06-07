@@ -1,19 +1,41 @@
 package com.hcmus.group11.novelaggregator.plugin.plugins;
 
+import com.aspose.words.HtmlLoadOptions;
+import com.aspose.words.LoadOptions;
+import com.aspose.words.SaveFormat;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hcmus.group11.novelaggregator.exception.type.HttpException;
 import com.hcmus.group11.novelaggregator.plugin.BaseApi;
 import com.hcmus.group11.novelaggregator.type.*;
 import com.hcmus.group11.novelaggregator.util.LevenshteinDistance;
 import com.hcmus.group11.novelaggregator.util.RequestAttributeUtil;
+import com.ironsoftware.ironpdf.License;
+import com.ironsoftware.ironpdf.PdfDocument;
+import com.ironsoftware.ironpdf.Settings;
+import nl.siegmann.epublib.domain.Book;
+import nl.siegmann.epublib.domain.Metadata;
+import nl.siegmann.epublib.domain.Resource;
+import nl.siegmann.epublib.epub.EpubWriter;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StreamUtils;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.Normalizer;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Component
 public class TruyenFull extends BaseApi {
@@ -347,5 +369,251 @@ public class TruyenFull extends BaseApi {
         Map<String, Object> pagination = (Map<String, Object>) meta.get("pagination");
 
         return (Integer) pagination.get("total_pages");
+    }
+
+    @Override
+    public Object convertToPdf(String jsonChapterDetail) {
+        ChapterDetail chapterDetail = new ChapterDetail();
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            Map<String, Object> jsonMap = objectMapper.readValue(jsonChapterDetail, Map.class);
+            Map<String, Object> data = (Map<String, Object>) jsonMap.get("data");
+            String status = (String) jsonMap.get("status");
+
+            if (status.equals("error")) {
+                return null;
+            } else {
+                chapterDetail.setNovelTitle((String) data.get("story_name"));
+                chapterDetail.setTitle((String) data.get("chapter_name"));
+
+                System.out.println((String) data.get("story_name"));
+                System.out.println((String) data.get("chapter_name"));
+                System.out.println((String) data.get("content"));
+
+                String story_name = "<h1>" + (String) data.get("story_name") + "</h1>";
+                String chapter_name = "<h2>" + (String) data.get("chapter_name") + "</h2>";
+                String storyDetailContent = (String) data.get("content");
+
+                String res = "<!DOCTYPE html>\n" +
+                        "<html>\n" +
+                        "<head></head>\n" +
+                        "<body>\n" +
+                        story_name + "\n" +
+                        chapter_name + "\n" +
+                        "<p>----------------</p>" +
+                        storyDetailContent +
+                        "</body>\n" +
+                        "</html>";
+                License.setLicenseKey("IRONSU ITE.PHUOCNHANTRANONE.GMAIL.COM.19627-FC5FEE9C2D-INXGX-VYU7MHFUBMGB-ED3PKWHT3AMU-UTUZKSBPC72L-CX5JGC3TRI7V-S2AI7AMHQ7JT-DZL6THKRKTWV-5DP5YB-T2HOSDH6JXCMUA-DEPLOYMENT.TRIAL-5ESGQZ.TRIAL.EXPIRES.04.JUL.2024");
+
+                Settings.setLogPath(Paths.get("C:/tmp/IronPdfEngine.log"));
+
+                PdfDocument myPdf = PdfDocument.renderHtmlAsPdf(res);
+
+                myPdf.saveAs(Paths.get("novel.pdf"));
+
+                String pdfFilePath = "novel.pdf";
+                File pdfFile = new File("novel.pdf");
+
+                InputStreamResource resource = new InputStreamResource(new FileInputStream(pdfFilePath));
+
+                HttpHeaders headers = new HttpHeaders();
+                headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + pdfFile.getName());
+                headers.add(HttpHeaders.CONTENT_TYPE, "application/pdf");
+
+                // Return ResponseEntity with PDF content
+                ResponseEntity<byte[]> responseEntity = ResponseEntity.ok()
+                        .headers(headers)
+                        .contentLength(pdfFile.length())
+                        .contentType(MediaType.parseMediaType("application/pdf"))
+                        .body(resource.getContentAsByteArray());
+
+                // Delete the PDF file after it's transferred
+                pdfFile.delete();
+
+                return responseEntity;
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    @Override
+    protected Object convertToEpub(String jsonChapterDetail) throws JsonProcessingException {
+        ChapterDetail chapterDetail = new ChapterDetail();
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            Map<String, Object> jsonMap = objectMapper.readValue(jsonChapterDetail, Map.class);
+            Map<String, Object> data = (Map<String, Object>) jsonMap.get("data");
+            String status = (String) jsonMap.get("status");
+
+            if (status.equals("error")) {
+                return null;
+            } else {
+                chapterDetail.setNovelTitle((String) data.get("story_name"));
+                chapterDetail.setTitle((String) data.get("chapter_name"));
+
+                String story_name = (String) data.get("story_name");
+                String chapter_name = (String) data.get("chapter_name");
+                String storyDetailContent = (String) data.get("content");
+
+                Book book = new Book();
+                Metadata metadata = book.getMetadata();
+                String htmlContent = "<!DOCTYPE html>\n" +
+                        "<html>\n" +
+                        "<head></head>\n" +
+                        "<body>\n" +
+                        "<h1>" + story_name + "</h1>" +
+                        "<h2>" + chapter_name + "</h2>" +
+                        "<p>----------------</p>" +
+                        storyDetailContent +
+                        "</body>\n" +
+                        "</html>";
+                // Set the title
+                metadata.addTitle(story_name);
+                ByteArrayInputStream htmlInputStream = new ByteArrayInputStream(htmlContent.getBytes(StandardCharsets.UTF_8));
+                Resource htmlResource = new Resource(htmlInputStream, "file.html");
+                String epubFilePath = "book.epub";
+                book.addSection(chapter_name, htmlResource);
+
+                // Write the book to an EPUB file
+                try (FileOutputStream out = new FileOutputStream(epubFilePath)) {
+                    EpubWriter epubWriter = new EpubWriter();
+                    epubWriter.write(book, out);
+                }
+                System.out.println("EPUB file created successfully!");
+
+                File epubFile = new File(epubFilePath);
+                if (!epubFile.exists()) {
+                    throw new RuntimeException("Can't download a file");
+                }
+
+                InputStreamResource resource = new InputStreamResource(new FileInputStream(epubFilePath));
+
+                // Thiết lập headers HTTP
+
+                HttpHeaders headers = new HttpHeaders();
+                headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + epubFile.getName());
+                headers.add(HttpHeaders.CONTENT_TYPE, "application/epub+zip");
+// Create ResponseEntity with EPUB content
+                ResponseEntity<byte[]> responseEntity = ResponseEntity.ok()
+                        .headers(headers)
+                        .contentLength(epubFile.length())
+                        .contentType(MediaType.parseMediaType("application/epub+zip"))
+                        .body(resource.getContentAsByteArray());
+
+                epubFile.delete();
+
+                return responseEntity;
+            }
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    protected Object convertToImg(String jsonString) {
+        ChapterDetail chapterDetail = new ChapterDetail();
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            Map<String, Object> jsonMap = objectMapper.readValue(jsonString, Map.class);
+            Map<String, Object> data = (Map<String, Object>) jsonMap.get("data");
+            String status = (String) jsonMap.get("status");
+
+            if (status.equals("error")) {
+                return null;
+            } else {
+                chapterDetail.setNovelTitle((String) data.get("story_name"));
+                chapterDetail.setTitle((String) data.get("chapter_name"));
+
+                String story_name = (String) data.get("story_name");
+                String chapter_name = (String) data.get("chapter_name");
+                String storyDetailContent = (String) data.get("content");
+
+                Book book = new Book();
+                Metadata metadata = book.getMetadata();
+                String htmlContent = "<!DOCTYPE html>\n" +
+                        "<html>\n" +
+                        "<head></head>\n" +
+                        "<body>\n" +
+                        "<h1>" + story_name + "</h1>" +
+                        "<h2>" + chapter_name + "</h2>" +
+                        "<p>----------------</p>" +
+                        storyDetailContent +
+                        "</body>\n" +
+                        "</html>";
+                // Set the title
+                // Tạo tài liệu từ chuỗi HTML
+                ByteArrayInputStream inputStream = new ByteArrayInputStream(htmlContent.getBytes(StandardCharsets.UTF_8));
+                LoadOptions loadOptions = new HtmlLoadOptions();
+                com.aspose.words.Document doc = new com.aspose.words.Document(inputStream, loadOptions);
+
+                // Lưu tài liệu xuống file HTML
+                doc.save("input.html", SaveFormat.HTML);
+
+                // Mở tài liệu từ file HTML
+                doc = new com.aspose.words.Document("input.html");
+
+                // Thực hiện các thao tác cần thiết trên tài liệu
+                for (int page = 0; page < doc.getPageCount(); page++) {
+                    com.aspose.words.Document extractedPage = doc.extractPages(page, 1);
+                    extractedPage.save(String.format("page_%d.png", page + 1), SaveFormat.PNG);
+                }
+
+
+                // Create a zip file containing the images
+                String zipFilePath = "novel_images.zip";
+                try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFilePath))) {
+                    for (int page = 0; page < doc.getPageCount(); page++) {
+                        String imagePath = String.format("page_%d.png", page + 1);
+                        zos.putNextEntry(new ZipEntry(imagePath));
+                        try (InputStream is = new FileInputStream(imagePath)) {
+                            StreamUtils.copy(is, zos);
+                        }
+                        zos.closeEntry();
+                    }
+                }
+
+                // Prepare the zip file to be sent as a response
+                File zipFile = new File(zipFilePath);
+                InputStreamResource resource = new InputStreamResource(new FileInputStream(zipFilePath));
+
+                // Set HTTP headers
+                HttpHeaders headers = new HttpHeaders();
+                headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + zipFile.getName());
+                headers.add(HttpHeaders.CONTENT_TYPE, "application/zip");
+
+                // Create the response entity
+                ResponseEntity<byte[]> responseEntity = ResponseEntity.ok()
+                        .headers(headers)
+                        .contentLength(zipFile.length())
+                        .contentType(MediaType.parseMediaType("application/zip"))
+                        .body(resource.getContentAsByteArray());
+
+                // Delete the images and the zip file after sending the response
+                for (int page = 0; page < doc.getPageCount(); page++) {
+                    Files.deleteIfExists(Paths.get(String.format("page_%d.png", page + 1)));
+                }
+                Files.deleteIfExists(Paths.get(zipFilePath));
+                File trashFile1 = new File("input.001.png");
+                File trashFile2 = new File("input.html");
+
+                trashFile1.delete();
+                trashFile2.delete();
+                return responseEntity;
+            }
+        } catch (JsonMappingException e) {
+            throw new RuntimeException(e);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

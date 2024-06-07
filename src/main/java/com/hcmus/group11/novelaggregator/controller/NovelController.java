@@ -173,4 +173,46 @@ public class NovelController {
     public List<SwitchPluginMetaData> getSwitchPluginMetaData(@RequestParam() String chapterIndex, @RequestParam String novelUrl) {
         return novelService.getSwitchPluginMetaData(chapterIndex, novelUrl);
     }
+    @GetMapping("/htmlToEpub")
+    public Object convertHtmlToEpub(@RequestParam() String url) throws Exception {
+        return novelService.convertHtmlToEpub(url);
+    }
+
+    @Operation(summary = "Convert HTML to PDF",
+            parameters = {
+                    @Parameter(name = "url", description = "URL of the HTML", required = true, example = "http://example.com/novel")
+            },
+            responses = {
+                    @ApiResponse(description = "PDF file", responseCode = "200", content = @Content(mediaType = "application/pdf")),
+                    @ApiResponse(responseCode = "400", description = "Invalid URL",
+                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class))),
+                    @ApiResponse(responseCode = "404", description = "Not Found",
+                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error",
+                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class)))
+            }
+    )
+    @GetMapping("/htmlToPdf")
+    public Object convertHtmlToPdf(@RequestParam() String url) throws Exception {
+        return novelService.convertHtmlToPdf(url);
+    }
+
+    @Operation(summary = "Convert HTML to Image",
+            parameters = {
+                    @Parameter(name = "url", description = "URL of the HTML", required = true, example = "http://example.com/novel")
+            },
+            responses = {
+                    @ApiResponse(description = "Image file", responseCode = "200", content = @Content(mediaType = "image/png")),
+                    @ApiResponse(responseCode = "400", description = "Invalid URL",
+                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class))),
+                    @ApiResponse(responseCode = "404", description = "Not Found",
+                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error",
+                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class)))
+            }
+    )
+    @GetMapping("/htmlToImg")
+    public Object convertHtmlToImg(@RequestParam() String url) throws Exception {
+        return novelService.convertHtmlToImg(url);
+    }
 }
