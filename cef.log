@@ -1,0 +1,85 @@
+[0607/175405.382:VERBOSE1:pref_proxy_config_tracker_impl.cc(187)] 00000044000D4900: set chrome proxy config service to 00000044000BC380
+[0607/175405.393:VERBOSE1:webrtc_internals.cc(120)] Could not get the download directory.
+[0607/175405.395:VERBOSE1:media_stream_manager.cc(1113)] MSM::InitializeMaybeAsync([this=0000004400035C80])
+[0607/175405.395:VERBOSE1:media_stream_manager.cc(1113)] MDM::MediaDevicesManager()
+[0607/175405.395:VERBOSE1:media_stream_manager.cc(1113)] MSM::MediaStreamManager([this=0000004400035C80]))
+[0607/175405.416:VERBOSE1:first_party_sets_handler_impl.cc(262)] Empty path. Failed initializing First-Party Sets database.
+[0607/175405.535:ERROR:gpu_init.cc(523)] Passthrough is not supported, GL is disabled, ANGLE is 
+[0607/175405.666:VERBOSE1:configured_proxy_resolution_service.cc(1095)] Failed configuring with PAC script, falling-back to manual proxy servers.
+[0607/175407.963:VERBOSE1:pref_proxy_config_tracker_impl.cc(187)] 00000044000D7000: set chrome proxy config service to 00000044000BD880
+[0607/175407.992:VERBOSE1:configured_proxy_resolution_service.cc(1095)] Failed configuring with PAC script, falling-back to manual proxy servers.
+[0607/175408.054:INFO:cpu_info.cc(53)] Available number of cores: 4
+[0607/175408.112:VERBOSE1:frame_impl.cc(503)] frame 17179869185 [4,1] connection request (reason=RENDER_FRAME_CREATED)
+[0607/175408.113:VERBOSE1:frame_host_impl.cc(659)] frame 17179869185 [4,1] (main) connected
+[0607/175408.113:VERBOSE1:media_stream_manager.cc(1113)] RFAOSF::Core() [process_id=4, frame_id=1]
+[0607/175408.127:VERBOSE1:script_context.cc(206)] Created context:
+  extension id:           (none)
+  frame:                  000001830020CF90
+  URL:                    
+  context_type:           WEB_PAGE
+  effective extension id: (none)
+  effective context type: WEB_PAGE
+[0607/175408.128:VERBOSE1:script_context.cc(206)] Created context:
+  extension id:           (none)
+  frame:                  0000000000000000
+  URL:                    
+  context_type:           UNSPECIFIED
+  effective extension id: (none)
+  effective context type: UNSPECIFIED
+[0607/175408.128:VERBOSE1:dispatcher.cc(452)] Num tracked contexts: 1
+[0607/175408.143:VERBOSE1:network_delegate.cc(34)] NetworkDelegate::NotifyBeforeURLRequest: https://fonts.googleapis.com/css?family=Roboto:300,400,400i,500,500i,700,700i,900
+[0607/175408.149:VERBOSE1:network_delegate.cc(34)] NetworkDelegate::NotifyBeforeURLRequest: https://truyen.tangthuvien.vn/css/font-awesome.min.css
+[0607/175408.150:VERBOSE1:network_delegate.cc(34)] NetworkDelegate::NotifyBeforeURLRequest: https://truyen.tangthuvien.vn/css/bootstrap.css
+[0607/175408.170:VERBOSE1:network_delegate.cc(34)] NetworkDelegate::NotifyBeforeURLRequest: https://truyen.tangthuvien.vn/css/bootstrap-theme.css
+[0607/175408.191:VERBOSE1:network_delegate.cc(34)] NetworkDelegate::NotifyBeforeURLRequest: https://truyen.tangthuvien.vn/css/styles.css?v=1717757564
+[0607/175408.191:WARNING:task_impl.cc(20)] No task runner for threadId 6
+[0607/175408.192:VERBOSE1:network_delegate.cc(34)] NetworkDelegate::NotifyBeforeURLRequest: https://truyen.tangthuvien.vn/js/jquery-2.2.4.js
+[0607/175408.192:VERBOSE1:network_delegate.cc(34)] NetworkDelegate::NotifyBeforeURLRequest: https://truyen.tangthuvien.vn/js/bootstrap.js
+[0607/175408.193:VERBOSE1:network_delegate.cc(34)] NetworkDelegate::NotifyBeforeURLRequest: https://truyen.tangthuvien.vn/css/chapter.css?v=1717757564
+[0607/175408.228:VERBOSE1:network_delegate.cc(34)] NetworkDelegate::NotifyBeforeURLRequest: http://apps.identrust.com/roots/dstrootcax3.p7c
+[0607/175408.363:ERROR:cert_issuer_source_aia.cc(34)] Error parsing cert retrieved from AIA (as DER):
+ERROR: Couldn't read tbsCertificate as SEQUENCE
+ERROR: Failed parsing Certificate
+
+[0607/175409.342:VERBOSE1:network_delegate.cc(34)] NetworkDelegate::NotifyBeforeURLRequest: https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmEU9fBBc4.woff2
+[0607/175409.345:VERBOSE1:network_delegate.cc(34)] NetworkDelegate::NotifyBeforeURLRequest: https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmSU5fBBc4.woff2
+[0607/175409.353:VERBOSE1:network_delegate.cc(34)] NetworkDelegate::NotifyBeforeURLRequest: https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmEU9fChc4EsA.woff2
+[0607/175409.356:VERBOSE1:network_delegate.cc(34)] NetworkDelegate::NotifyBeforeURLRequest: https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmEU9fCxc4EsA.woff2
+[0607/175409.372:VERBOSE1:network_delegate.cc(34)] NetworkDelegate::NotifyBeforeURLRequest: https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmSU5fChc4EsA.woff2
+[0607/175409.374:VERBOSE1:network_delegate.cc(34)] NetworkDelegate::NotifyBeforeURLRequest: https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmSU5fCxc4EsA.woff2
+[0607/175409.528:VERBOSE1:network_delegate.cc(34)] NetworkDelegate::NotifyBeforeURLRequest: https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmEU9fBBc4.woff2
+[0607/175409.539:VERBOSE1:network_delegate.cc(34)] NetworkDelegate::NotifyBeforeURLRequest: https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmSU5fBBc4.woff2
+[0607/175409.540:VERBOSE1:network_delegate.cc(34)] NetworkDelegate::NotifyBeforeURLRequest: https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmEU9fChc4EsA.woff2
+[0607/175409.541:VERBOSE1:network_delegate.cc(34)] NetworkDelegate::NotifyBeforeURLRequest: https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmEU9fCxc4EsA.woff2
+[0607/175409.541:VERBOSE1:network_delegate.cc(34)] NetworkDelegate::NotifyBeforeURLRequest: https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmSU5fChc4EsA.woff2
+[0607/175409.542:VERBOSE1:network_delegate.cc(34)] NetworkDelegate::NotifyBeforeURLRequest: https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmSU5fCxc4EsA.woff2
+[0607/175410.078:WARNING:task_impl.cc(20)] No task runner for threadId 6
+[0607/175410.670:VERBOSE1:network_delegate.cc(34)] NetworkDelegate::NotifyBeforeURLRequest: https://dns.google/dns-query?dns=AAABAAABAAAAAAABA3d3dwdnc3RhdGljA2NvbQAAAQABAAApEAAAAAAAAFQADABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+[0607/175410.672:VERBOSE1:network_delegate.cc(34)] NetworkDelegate::NotifyBeforeURLRequest: https://dns.google/dns-query?dns=AAABAAABAAAAAAABA3d3dwdnc3RhdGljA2NvbQAAAQABAAApEAAAAAAAAFQADABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+[0607/175410.971:VERBOSE1:frame_host_impl.cc(492)] frame 17179869185 [4,1] (main) detached (reason=NEW_MAIN_FRAME, is_connected=1)
+[0607/175606.486:VERBOSE1:pref_proxy_config_tracker_impl.cc(187)] 00000044000D7C00: set chrome proxy config service to 00000044000BDC00
+[0607/175606.500:VERBOSE1:network_delegate.cc(34)] NetworkDelegate::NotifyBeforeURLRequest: https://dns.google/dns-query?dns=AAABAAABAAAAAAABA3d3dwdnc3RhdGljA2NvbQAAAQABAAApEAAAAAAAAFQADABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+[0607/175606.512:VERBOSE1:configured_proxy_resolution_service.cc(1095)] Failed configuring with PAC script, falling-back to manual proxy servers.
+[0607/175606.566:INFO:cpu_info.cc(53)] Available number of cores: 4
+[0607/175606.593:VERBOSE1:frame_impl.cc(503)] frame 25769803777 [6,1] connection request (reason=RENDER_FRAME_CREATED)
+[0607/175606.594:VERBOSE1:frame_host_impl.cc(659)] frame 25769803777 [6,1] (main) connected
+[0607/175606.594:VERBOSE1:media_stream_manager.cc(1113)] RFAOSF::Core() [process_id=6, frame_id=1]
+[0607/175606.602:VERBOSE1:script_context.cc(206)] Created context:
+  extension id:           (none)
+  frame:                  000006950020CF90
+  URL:                    
+  context_type:           WEB_PAGE
+  effective extension id: (none)
+  effective context type: WEB_PAGE
+[0607/175606.603:VERBOSE1:script_context.cc(206)] Created context:
+  extension id:           (none)
+  frame:                  0000000000000000
+  URL:                    
+  context_type:           UNSPECIFIED
+  effective extension id: (none)
+  effective context type: UNSPECIFIED
+[0607/175606.603:VERBOSE1:dispatcher.cc(452)] Num tracked contexts: 1
+[0607/175606.607:WARNING:task_impl.cc(20)] No task runner for threadId 6
+[0607/175606.613:INFO:cpu_info.cc(53)] Available number of cores: 4
+[0607/175606.677:WARNING:task_impl.cc(20)] No task runner for threadId 6
+[0607/175606.875:VERBOSE1:frame_host_impl.cc(492)] frame 25769803777 [6,1] (main) detached (reason=NEW_MAIN_FRAME, is_connected=1)
