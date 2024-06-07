@@ -5,6 +5,7 @@ import com.hcmus.group11.novelaggregator.type.ChapterInfo;
 import com.hcmus.group11.novelaggregator.type.NovelDetail;
 import com.hcmus.group11.novelaggregator.type.NovelSearchResult;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface INovelPlugin {
@@ -27,5 +28,11 @@ public interface INovelPlugin {
     NovelSearchResult findSimilarNovel(String title, String author);
 
     ChapterInfo getChapterInfoByNovelUrlAndChapterIndex(String novelUrl, String chapterIndex);
+
+    Object convertHtmlToPdf(String url) throws IOException;
+
+    Object convertHtmlToEpub(String url) throws IOException;
+
+    Object convertHtmlToImg(String url) throws Exception;
 
 }

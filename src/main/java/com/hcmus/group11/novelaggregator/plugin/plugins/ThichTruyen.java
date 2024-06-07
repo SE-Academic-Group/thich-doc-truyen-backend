@@ -1,18 +1,40 @@
 package com.hcmus.group11.novelaggregator.plugin.plugins;
 
+import com.aspose.words.HtmlLoadOptions;
+import com.aspose.words.LoadOptions;
+import com.aspose.words.SaveFormat;
 import com.hcmus.group11.novelaggregator.exception.type.HttpException;
 import com.hcmus.group11.novelaggregator.plugin.BaseCrawler;
 import com.hcmus.group11.novelaggregator.type.*;
 import com.hcmus.group11.novelaggregator.util.RequestAttributeUtil;
+import com.ironsoftware.ironpdf.License;
+import com.ironsoftware.ironpdf.PdfDocument;
+import com.ironsoftware.ironpdf.Settings;
+import nl.siegmann.epublib.domain.Author;
+import nl.siegmann.epublib.domain.Book;
+import nl.siegmann.epublib.domain.Metadata;
+import nl.siegmann.epublib.domain.Resource;
+import nl.siegmann.epublib.epub.EpubWriter;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StreamUtils;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Component
 public class ThichTruyen extends BaseCrawler {
@@ -223,5 +245,234 @@ public class ThichTruyen extends BaseCrawler {
         }
 
         return str;
+    }
+    @Override
+    protected Object convertToEpub(Document html) throws IOException {
+
+        Elements storyDetailHeader = html.select("div.story-detail-header");
+        Element header = html.selectFirst("head");
+        Elements storyDetailContent = html.select("div.story-detail-content");
+        // Get Novel name
+        Elements breadCrumb = html.select("div.main-breadcrumb ul.breadcrumb li");
+        String novelName = breadCrumb.get(2).text();
+        String novelNameHtml = "<p>" + novelName + "</p>";
+        // Get Story detail header
+
+        // Chapter name
+        Elements chapterName = html.select("div.story-detail-header h1");
+        // Author name
+        Elements authorName = html.select("div.story-detail-header p.story-detail-author");
+
+        assert header != null;
+
+        Book book = new Book();
+        Metadata metadata = book.getMetadata();
+        String htmlContent = "<!DOCTYPE html>\n" +
+                "<html>\n" +
+                header.html() +
+                "<body>\n" +
+                novelNameHtml +
+                storyDetailHeader.html() +
+                "<p>----------------</p>" +
+                storyDetailContent.html() +
+                "</body>\n" +
+                "</html>";
+
+        // Set the title
+        metadata.addTitle(novelName);
+        // Add an Author
+        metadata.addAuthor(new Author(authorName.text()));
+
+        try {
+            ByteArrayInputStream htmlInputStream = new ByteArrayInputStream(htmlContent.getBytes(StandardCharsets.UTF_8));
+//            FileInputStream htmlInputStream = new FileInputStream(htmlInputStream);
+            Resource htmlResource = new Resource(htmlInputStream, "file.html");
+            String epubFilePath = "book.epub";
+            book.addSection(chapterName.text(), htmlResource);
+
+            // Write the book to an EPUB file
+            try (FileOutputStream out = new FileOutputStream(epubFilePath)) {
+                EpubWriter epubWriter = new EpubWriter();
+                epubWriter.write(book, out);
+            }
+            System.out.println("EPUB file created successfully!");
+
+            File epubFile = new File(epubFilePath);
+            if (!epubFile.exists()) {
+                throw new RuntimeException("Can't download a file");
+            }
+
+            InputStreamResource resource = new InputStreamResource(new FileInputStream(epubFilePath));
+
+            // Thiết lập headers HTTP
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + epubFile.getName());
+            headers.add(HttpHeaders.CONTENT_TYPE, "application/epub+zip");
+            // Create ResponseEntity with EPUB content
+            ResponseEntity<byte[]> responseEntity = ResponseEntity.ok()
+                    .headers(headers)
+                    .contentLength(epubFile.length())
+                    .contentType(MediaType.parseMediaType("application/epub+zip"))
+                    .body(resource.getContentAsByteArray());
+
+            epubFile.delete();
+
+            return responseEntity;
+        } catch (IOException e) {
+            throw new RuntimeException("Khong the tai file");
+        }
+    }
+
+    @Override
+    protected Object convertToPDF(Document html) throws IOException {
+        Elements storyDetailHeader = html.select("div.story-detail-header");
+        Element header = html.selectFirst("head");
+        Elements storyDetailContent = html.select("div.story-detail-content");
+        // Get Novel name
+        Elements breadCrumb = html.select("div.main-breadcrumb ul.breadcrumb li");
+        String novelName = breadCrumb.get(2).text();
+        String novelNameHtml = "<p>" + novelName + "</p>";
+        // Get Story detail header
+
+        // Chapter name
+        Elements chapterName = html.select("div.story-detail-header h1");
+        // Author name
+        Elements authorName = html.select("div.story-detail-header p.story-detail-author");
+
+        String res = header + "\n" +
+                novelNameHtml + "\n" +
+                chapterName + "\n" +
+                authorName + "\n" +
+                storyDetailContent.html();
+
+        License.setLicenseKey("IRONSU ITE.PHUOCNHANTRANONE.GMAIL.COM.19627-FC5FEE9C2D-INXGX-VYU7MHFUBMGB-ED3PKWHT3AMU-UTUZKSBPC72L-CX5JGC3TRI7V-S2AI7AMHQ7JT-DZL6THKRKTWV-5DP5YB-T2HOSDH6JXCMUA-DEPLOYMENT.TRIAL-5ESGQZ.TRIAL.EXPIRES.04.JUL.2024");
+
+        Settings.setLogPath(Paths.get("C:/tmp/IronPdfEngine.log"));
+
+        PdfDocument myPdf = PdfDocument.renderHtmlAsPdf(res);
+
+        myPdf.saveAs(Paths.get("novel.pdf"));
+
+        String pdfFilePath = "novel.pdf";
+        File pdfFile = new File("novel.pdf");
+
+        try {
+            InputStreamResource resource = new InputStreamResource(new FileInputStream(pdfFilePath));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + pdfFile.getName());
+            headers.add(HttpHeaders.CONTENT_TYPE, "application/pdf");
+            // Return ResponseEntity with PDF content
+            ResponseEntity<byte[]> responseEntity = ResponseEntity.ok()
+                    .headers(headers)
+                    .contentLength(pdfFile.length())
+                    .contentType(MediaType.parseMediaType("application/pdf"))
+                    .body(resource.getContentAsByteArray());
+
+            // Delete the PDF file after it's transferred
+            pdfFile.delete();
+
+            return responseEntity;
+        } catch (IOException e) {
+            throw new RuntimeException("Could not read file: " + pdfFilePath, e);
+        }
+    }
+
+    @Override
+    protected Object convertToImg(Document html) throws Exception {
+        // Chuỗi HTML cần chuyển đổi
+        Elements storyDetailHeader = html.select("div.story-detail-header");
+        Element header = html.selectFirst("head");
+        Elements storyDetailContent = html.select("div.story-detail-content");
+        // Get Novel name
+        Elements breadCrumb = html.select("div.main-breadcrumb ul.breadcrumb li");
+        String novelName = breadCrumb.get(2).text();
+        String novelNameHtml = "<p>" + novelName + "</p>";
+        // Get Story detail header
+
+        // Chapter name
+        Elements chapterName = html.select("div.story-detail-header h1");
+        // Author name
+        Elements authorName = html.select("div.story-detail-header p.story-detail-author");
+
+        String chapterNameHtml = "<h2>" + chapterName.text() + "</h2>";
+        String authorNameHtml = "<p>" + authorName.text() + "</p>";
+
+        String htmlContent = "<!DOCTYPE html>\n" +
+                "<html>\n" +
+                header +
+                "<body>\n" +
+                novelNameHtml +
+                authorNameHtml +
+                chapterNameHtml +
+                "<p>----------------</p>" +
+                storyDetailContent.html()+
+                "</body>\n" +
+                "</html>";
+
+        try {
+            // Tạo tài liệu từ chuỗi HTML
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(htmlContent.getBytes(StandardCharsets.UTF_8));
+            LoadOptions loadOptions = new HtmlLoadOptions();
+            com.aspose.words.Document doc = new com.aspose.words.Document(inputStream, loadOptions);
+
+            // Lưu tài liệu xuống file HTML
+            doc.save("input.html", SaveFormat.HTML);
+
+            // Mở tài liệu từ file HTML
+            doc = new com.aspose.words.Document("input.html");
+
+            // Thực hiện các thao tác cần thiết trên tài liệu
+            for (int page = 0; page < doc.getPageCount(); page++) {
+                com.aspose.words.Document extractedPage = doc.extractPages(page, 1);
+                extractedPage.save(String.format("page_%d.png", page + 1), SaveFormat.PNG);
+            }
+
+
+            // Create a zip file containing the images
+            String zipFilePath = "novel_images.zip";
+            try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFilePath))) {
+                for (int page = 0; page < doc.getPageCount(); page++) {
+                    String imagePath = String.format("page_%d.png", page + 1);
+                    zos.putNextEntry(new ZipEntry(imagePath));
+                    try (InputStream is = new FileInputStream(imagePath)) {
+                        StreamUtils.copy(is, zos);
+                    }
+                    zos.closeEntry();
+                }
+            }
+
+            // Prepare the zip file to be sent as a response
+            File zipFile = new File(zipFilePath);
+            InputStreamResource resource = new InputStreamResource(new FileInputStream(zipFilePath));
+
+            // Set HTTP headers
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + zipFile.getName());
+            headers.add(HttpHeaders.CONTENT_TYPE, "application/zip");
+
+            // Create the response entity
+            ResponseEntity<byte[]> responseEntity = ResponseEntity.ok()
+                    .headers(headers)
+                    .contentLength(zipFile.length())
+                    .contentType(MediaType.parseMediaType("application/zip"))
+                    .body(resource.getContentAsByteArray());
+
+            // Delete the images and the zip file after sending the response
+            for (int page = 0; page < doc.getPageCount(); page++) {
+                Files.deleteIfExists(Paths.get(String.format("page_%d.png", page + 1)));
+            }
+            Files.deleteIfExists(Paths.get(zipFilePath));
+            File trashFile1 = new File("input.001.png");
+            File trashFile2 = new File("input.html");
+
+            trashFile1.delete();
+            trashFile2.delete();
+            return responseEntity;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
