@@ -154,13 +154,13 @@ public class NovelController {
 
     @Operation(summary = "Switch plugin metadata",
             parameters = {
-                    @Parameter(name = "noveUrl", description = "URL of the novel", required = true, example = "http://example.com/novel"),
+                    @Parameter(name = "novelUrl", description = "URL of the novel", required = true, example = "http://example.com/novel"),
                     @Parameter(name = "chapterIndex", description = "Index of the chapter", required = true, example = "1")
             },
             responses = {
                     @ApiResponse(description = "Chapter Information of each plugin",
                             responseCode = "200",
-                            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ChapterInfo.class)))),
+                            content = @Content(array = @ArraySchema(schema = @Schema(implementation = SwitchPluginMetaData.class)))),
                     @ApiResponse(responseCode = "400", description = "Invalid URL",
                             content = @Content(schema = @Schema(implementation = TransformedHttpException.class))),
                     @ApiResponse(responseCode = "404", description = "Not Found",
