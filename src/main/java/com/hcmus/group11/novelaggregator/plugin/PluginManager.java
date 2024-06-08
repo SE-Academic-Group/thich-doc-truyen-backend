@@ -1,6 +1,7 @@
 package com.hcmus.group11.novelaggregator.plugin;
 
 import com.hcmus.group11.novelaggregator.exception.type.HttpException;
+import com.hcmus.group11.novelaggregator.type.DownloadOptions;
 import com.hcmus.group11.novelaggregator.type.PluginMetadata;
 import org.springframework.stereotype.Service;
 
@@ -13,9 +14,11 @@ import java.util.Map;
 @Service
 public class PluginManager {
     private Map<String, INovelPlugin> novelPluginMap;
+    private List<DownloadOptions> downloadOptionsList;
 
-    public PluginManager(Map<String, INovelPlugin> novelPluginMap) {
+    public PluginManager(Map<String, INovelPlugin> novelPluginMap, List<DownloadOptions> downloadOptionsList) {
         this.novelPluginMap = novelPluginMap;
+        this.downloadOptionsList = downloadOptionsList;
     }
 
     public INovelPlugin getPlugin(String pluginName) {
@@ -59,6 +62,9 @@ public class PluginManager {
         }catch (MalformedURLException e){
             throw new RuntimeException(e.getMessage());
         }
+    }
 
+    public List<DownloadOptions> getDownloadOptionsList() {
+        return downloadOptionsList;
     }
 }
