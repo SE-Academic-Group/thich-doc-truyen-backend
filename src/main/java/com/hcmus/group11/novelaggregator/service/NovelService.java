@@ -113,4 +113,8 @@ public class NovelService {
         return plugin.convertHtmlToImg(url);
     }
 
+    public List<DownloadOptions> getDownloadOptionsList() {
+        return pluginManager.getDownloadOptionsList();
+    }
+
 }

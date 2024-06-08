@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.constraints.Min;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("")
 public class NovelController {
+
     private NovelService novelService;
 
     public NovelController(NovelService novelService) {
@@ -188,7 +190,7 @@ public class NovelController {
                             content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class)))
             }
     )
-    @GetMapping("/htmlToEpub")
+    @GetMapping( "${download.paths.EPUB}")
     public Object convertHtmlToEpub(@RequestParam() String url) throws Exception {
         return novelService.convertHtmlToEpub(url);
     }
@@ -207,7 +209,7 @@ public class NovelController {
                             content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class)))
             }
     )
-    @GetMapping("/htmlToPdf")
+    @GetMapping( "${download.paths.PDF}")
     public Object convertHtmlToPdf(@RequestParam() String url) throws Exception {
         return novelService.convertHtmlToPdf(url);
     }
@@ -226,8 +228,25 @@ public class NovelController {
                             content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class)))
             }
     )
-    @GetMapping("/htmlToImg")
+    @GetMapping("${download.paths.IMAGES}")
     public Object convertHtmlToImg(@RequestParam() String url) throws Exception {
         return novelService.convertHtmlToImg(url);
     }
+
+    @Operation(summary = "Get download options",
+            responses = {
+                    @ApiResponse(description = "list chapter download options",
+                            responseCode = "200",
+                            content = @Content(mediaType = "Json", array = @ArraySchema(schema = @Schema(implementation = DownloadOptions.class)))),
+                    @ApiResponse(responseCode = "400", description = "No endpoint found for the request",
+                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error",
+                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class)))
+            }
+    )
+    @GetMapping("/download-options")
+    public List<DownloadOptions> getDownloadOptions() {
+        return novelService.getDownloadOptionsList();
+    }
+
 }
