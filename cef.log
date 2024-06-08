@@ -803,3 +803,92 @@ ERROR: Failed parsing Certificate
 [0608/021038.716:WARNING:task_impl.cc(20)] No task runner for threadId 6
 [0608/021038.789:WARNING:task_impl.cc(20)] No task runner for threadId 6
 [0608/021039.004:VERBOSE1:frame_host_impl.cc(492)] frame 34359738369 [8,1] (main) detached (reason=NEW_MAIN_FRAME, is_connected=1)
+[0608/125747.666:VERBOSE1:pref_proxy_config_tracker_impl.cc(187)] 000001B4000D4600: set chrome proxy config service to 000001B4000BC380
+[0608/125747.676:VERBOSE1:webrtc_internals.cc(120)] Could not get the download directory.
+[0608/125747.676:VERBOSE1:media_stream_manager.cc(1113)] MSM::InitializeMaybeAsync([this=000001B400071680])
+[0608/125747.676:VERBOSE1:media_stream_manager.cc(1113)] MDM::MediaDevicesManager()
+[0608/125747.676:VERBOSE1:media_stream_manager.cc(1113)] MSM::MediaStreamManager([this=000001B400071680]))
+[0608/125747.737:VERBOSE1:first_party_sets_handler_impl.cc(262)] Empty path. Failed initializing First-Party Sets database.
+[0608/125747.799:ERROR:gpu_init.cc(523)] Passthrough is not supported, GL is disabled, ANGLE is 
+[0608/125747.943:VERBOSE1:configured_proxy_resolution_service.cc(1095)] Failed configuring with PAC script, falling-back to manual proxy servers.
+[0608/125749.580:VERBOSE1:pref_proxy_config_tracker_impl.cc(187)] 000001B4000D7300: set chrome proxy config service to 000001B4001D8280
+[0608/125749.631:VERBOSE1:configured_proxy_resolution_service.cc(1095)] Failed configuring with PAC script, falling-back to manual proxy servers.
+[0608/125749.753:INFO:cpu_info.cc(53)] Available number of cores: 4
+[0608/125749.798:VERBOSE1:frame_impl.cc(503)] frame 17179869185 [4,1] connection request (reason=RENDER_FRAME_CREATED)
+[0608/125749.798:VERBOSE1:frame_host_impl.cc(659)] frame 17179869185 [4,1] (main) connected
+[0608/125749.799:VERBOSE1:media_stream_manager.cc(1113)] RFAOSF::Core() [process_id=4, frame_id=1]
+[0608/125749.807:VERBOSE1:script_context.cc(206)] Created context:
+  extension id:           (none)
+  frame:                  000005ED0020CF90
+  URL:                    
+  context_type:           WEB_PAGE
+  effective extension id: (none)
+  effective context type: WEB_PAGE
+[0608/125749.808:VERBOSE1:script_context.cc(206)] Created context:
+  extension id:           (none)
+  frame:                  0000000000000000
+  URL:                    
+  context_type:           UNSPECIFIED
+  effective extension id: (none)
+  effective context type: UNSPECIFIED
+[0608/125749.808:VERBOSE1:dispatcher.cc(452)] Num tracked contexts: 1
+[0608/125749.817:VERBOSE1:network_delegate.cc(34)] NetworkDelegate::NotifyBeforeURLRequest: https://thichtruyen.vn/asset/css/fontawesome-free-6.2.0-web/css/all.css?v=1705024616
+[0608/125749.825:VERBOSE1:network_delegate.cc(34)] NetworkDelegate::NotifyBeforeURLRequest: https://thichtruyen.vn/frontend/css/toastify.css?v=1705024616
+[0608/125749.825:VERBOSE1:network_delegate.cc(34)] NetworkDelegate::NotifyBeforeURLRequest: https://thichtruyen.vn/asset/css/bootstrap.min.css?v=1705024616
+[0608/125749.825:VERBOSE1:network_delegate.cc(34)] NetworkDelegate::NotifyBeforeURLRequest: https://thichtruyen.vn/asset/css/swiper-bundle.min.css?v=1705024616
+[0608/125749.827:WARNING:task_impl.cc(20)] No task runner for threadId 6
+[0608/125749.830:VERBOSE1:network_delegate.cc(34)] NetworkDelegate::NotifyBeforeURLRequest: https://thichtruyen.vn/asset/css/style.css?v=1708309029
+[0608/125749.829:INFO:cpu_info.cc(53)] Available number of cores: 4
+[0608/125749.830:VERBOSE1:network_delegate.cc(34)] NetworkDelegate::NotifyBeforeURLRequest: https://thichtruyen.vn/asset/css/main.css?v=1715856936
+[0608/125750.024:VERBOSE1:network_delegate.cc(34)] NetworkDelegate::NotifyBeforeURLRequest: https://thichtruyen.vn/asset/fonts/Roboto-Regular.ttf
+[0608/125750.110:VERBOSE1:network_delegate.cc(34)] NetworkDelegate::NotifyBeforeURLRequest: https://thichtruyen.vn/asset/fonts/Roboto-Regular.ttf
+[0608/125750.135:VERBOSE1:url_loader.cc(1601)] Will sniff content for mime type: https://thichtruyen.vn/asset/fonts/Roboto-Regular.ttf
+[0608/125750.189:VERBOSE1:layout_shift_tracker.cc(353)] in "http://ironinternalfraqbc8wsa1xvpfvjcrg.com/", 000005ED00122430:LayoutText #text moved from 0,77.3906 1007x17 to 0,76.3906 1007x17 (visible from 0,77 1007x17 to 0,76 1007x17)
+[0608/125750.190:VERBOSE1:layout_shift_tracker.cc(362)]  (starting point from 437,77.3906 to 432.844,76.3906)
+[0608/125750.190:VERBOSE1:layout_shift_tracker.cc(353)] in "http://ironinternalfraqbc8wsa1xvpfvjcrg.com/", 000005ED00124658:LayoutNGBlockFlow P moved from -1,625.391 1008x60 to -1,645.391 1008x80 (visible from 0,625 1007x60 to 0,645 1007x80)
+[0608/125750.191:VERBOSE1:layout_shift_tracker.cc(362)]  (starting point from 0,625.391 to 0,645.391)
+[0608/125750.191:VERBOSE1:layout_shift_tracker.cc(353)] in "http://ironinternalfraqbc8wsa1xvpfvjcrg.com/", 000005ED00124748:LayoutText #text moved from -1,627.391 1008x77 to -1,646.391 1008x77 (visible from 0,627 1007x77 to 0,646 1007x77)
+[0608/125750.191:VERBOSE1:layout_shift_tracker.cc(362)]  (starting point from 0,627.391 to 0,646.391)
+[0608/125750.191:VERBOSE1:layout_shift_tracker.cc(353)] in "http://ironinternalfraqbc8wsa1xvpfvjcrg.com/", 000005ED00124A68:LayoutNGBlockFlow P moved from -1,715.391 1008x20 to 0,755.391 1007x20 (visible from 0,715 1007x20 to 0,755 1007x20)
+[0608/125750.191:VERBOSE1:layout_shift_tracker.cc(362)]  (starting point from 0,715.391 to 0,755.391)
+[0608/125750.191:VERBOSE1:layout_shift_tracker.cc(353)] in "http://ironinternalfraqbc8wsa1xvpfvjcrg.com/", 000005ED00124B58:LayoutText #text moved from -1,717.391 1008x17 to 0,756.391 1007x17 (visible from 0,717 1007x17 to 0,756 1007x17)
+[0608/125750.191:VERBOSE1:layout_shift_tracker.cc(362)]  (starting point from 0,717.391 to 0,756.391)
+[0608/125750.191:VERBOSE1:layout_shift_tracker.cc(353)] in "http://ironinternalfraqbc8wsa1xvpfvjcrg.com/", 000005ED00124E78:LayoutNGBlockFlow P moved from -1,765.391 1008x40 to 0,805.391 1007x40 (visible from 0,765 1007x40 to 0,805 1007x40)
+[0608/125750.191:VERBOSE1:layout_shift_tracker.cc(362)]  (starting point from 0,765.391 to 0,805.391)
+[0608/125750.191:VERBOSE1:layout_shift_tracker.cc(353)] in "http://ironinternalfraqbc8wsa1xvpfvjcrg.com/", 000005ED00124F68:LayoutText #text moved from -1,767.391 1008x37 to 0,806.391 1007x37 (visible from 0,767 1007x37 to 0,806 1007x37)
+[0608/125750.191:VERBOSE1:layout_shift_tracker.cc(362)]  (starting point from 0,767.391 to 0,806.391)
+[0608/125750.191:VERBOSE1:layout_shift_tracker.cc(353)] in "http://ironinternalfraqbc8wsa1xvpfvjcrg.com/", 000005ED00125288:LayoutNGBlockFlow P moved from 0,835.391 1007x20 to 0,875.391 1007x20 (visible from 0,835 1007x20 to 0,875 1007x20)
+[0608/125750.191:VERBOSE1:layout_shift_tracker.cc(353)] in "http://ironinternalfraqbc8wsa1xvpfvjcrg.com/", 000005ED00125378:LayoutText #text moved from 0,837.391 1007x17 to 0,876.391 1007x17 (visible from 0,837 1007x17 to 0,876 1007x17)
+[0608/125750.191:VERBOSE1:layout_shift_tracker.cc(353)] in "http://ironinternalfraqbc8wsa1xvpfvjcrg.com/", 000005ED00125698:LayoutNGBlockFlow P moved from -1,885.391 1008x60 to 0,925.391 1007x60 (visible from 0,885 1007x60 to 0,925 1007x60)
+[0608/125750.191:VERBOSE1:layout_shift_tracker.cc(362)]  (starting point from 0,885.391 to 0,925.391)
+[0608/125750.191:VERBOSE1:layout_shift_tracker.cc(353)] in "http://ironinternalfraqbc8wsa1xvpfvjcrg.com/", 000005ED00125788:LayoutText #text moved from -1,887.391 1008x57 to 0,926.391 1007x57 (visible from 0,887 1007x57 to 0,926 1007x57)
+[0608/125750.191:VERBOSE1:layout_shift_tracker.cc(362)]  (starting point from 0,887.391 to 0,926.391)
+[0608/125750.191:VERBOSE1:layout_shift_tracker.cc(353)] in "http://ironinternalfraqbc8wsa1xvpfvjcrg.com/", 000005ED00125AA8:LayoutNGBlockFlow P moved from -1,975.391 1008x20 to 0,1015.39 1007x20 (visible from 0,975 1007x20 to 0,1015 1007x20)
+[0608/125750.191:VERBOSE1:layout_shift_tracker.cc(362)]  (starting point from 0,975.391 to 0,1015.39)
+[0608/125750.191:VERBOSE1:layout_shift_tracker.cc(353)] in "http://ironinternalfraqbc8wsa1xvpfvjcrg.com/", 000005ED00125B98:LayoutText #text moved from -1,977.391 1008x17 to 0,1016.39 1007x17 (visible from 0,977 1007x17 to 0,1016 1007x17)
+[0608/125750.191:VERBOSE1:layout_shift_tracker.cc(362)]  (starting point from 0,977.391 to 0,1016.39)
+[0608/125750.191:VERBOSE1:layout_shift_tracker.cc(353)] in "http://ironinternalfraqbc8wsa1xvpfvjcrg.com/", 000005ED00125EB8:LayoutNGBlockFlow P moved from -1,1025.39 1008x60 to 0,1065.39 1007x60 (visible from 0,1025 1007x60 to 0,1065 1007x60)
+[0608/125750.191:VERBOSE1:layout_shift_tracker.cc(362)]  (starting point from 0,1025.39 to 0,1065.39)
+[0608/125750.191:VERBOSE1:layout_shift_tracker.cc(353)] in "http://ironinternalfraqbc8wsa1xvpfvjcrg.com/", 000005ED00125FA8:LayoutText #text moved from -1,1027.39 1008x57 to 0,1066.39 1007x57 (visible from 0,1027 1007x57 to 0,1066 1007x57)
+[0608/125750.191:VERBOSE1:layout_shift_tracker.cc(362)]  (starting point from 0,1027.39 to 0,1066.39)
+[0608/125750.191:VERBOSE1:layout_shift_tracker.cc(353)] in "http://ironinternalfraqbc8wsa1xvpfvjcrg.com/", 000005ED001262C8:LayoutNGBlockFlow P moved from -1,1115.39 1008x40 to 0,1155.39 1007x40 (visible from 0,1115 1007x40 to 0,1155 1007x40)
+[0608/125750.191:VERBOSE1:layout_shift_tracker.cc(362)]  (starting point from 0,1115.39 to 0,1155.39)
+[0608/125750.192:VERBOSE1:layout_shift_tracker.cc(353)] in "http://ironinternalfraqbc8wsa1xvpfvjcrg.com/", 000005ED001263B8:LayoutText #text moved from -1,1117.39 1008x37 to 0,1156.39 1007x37 (visible from 0,1117 1007x37 to 0,1156 1007x37)
+[0608/125750.192:VERBOSE1:layout_shift_tracker.cc(362)]  (starting point from 0,1117.39 to 0,1156.39)
+[0608/125750.192:VERBOSE1:layout_shift_tracker.cc(353)] in "http://ironinternalfraqbc8wsa1xvpfvjcrg.com/", 000005ED001266D8:LayoutNGBlockFlow P moved from -1,1185.39 1008x40 to 0,1225.39 1007x40 (visible from 0,1185 1007x40 to 0,1225 1007x40)
+[0608/125750.192:VERBOSE1:layout_shift_tracker.cc(362)]  (starting point from 0,1185.39 to 0,1225.39)
+[0608/125750.192:VERBOSE1:layout_shift_tracker.cc(353)] in "http://ironinternalfraqbc8wsa1xvpfvjcrg.com/", 000005ED001267C8:LayoutText #text moved from -1,1187.39 1008x37 to 0,1226.39 1007x37 (visible from 0,1187 1007x37 to 0,1226 1007x37)
+[0608/125750.192:VERBOSE1:layout_shift_tracker.cc(362)]  (starting point from 0,1187.39 to 0,1226.39)
+[0608/125750.192:VERBOSE1:layout_shift_tracker.cc(353)] in "http://ironinternalfraqbc8wsa1xvpfvjcrg.com/", 000005ED00126AE8:LayoutNGBlockFlow P moved from -1,1255.39 1008x40 to 0,1295.39 1007x60 (visible from 0,1255 1007x25 to 0,0 0x0)
+[0608/125750.192:VERBOSE1:layout_shift_tracker.cc(362)]  (starting point from 0,1255.39 to 0,1295.39)
+[0608/125750.192:VERBOSE1:layout_shift_tracker.cc(353)] in "http://ironinternalfraqbc8wsa1xvpfvjcrg.com/", 000005ED00126BD8:LayoutText #text moved from -1,1257.39 1008x57 to 0,1296.39 1007x57 (visible from 0,1257 1007x23 to 0,0 0x0)
+[0608/125750.192:VERBOSE1:layout_shift_tracker.cc(362)]  (starting point from 0,1257.39 to 0,1296.39)
+[0608/125750.193:VERBOSE1:layout_shift_tracker.cc(545)] in "http://ironinternalfraqbc8wsa1xvpfvjcrg.com/", viewport was 47.8906% impacted with distance fraction 0.03125 and subframe weighting factor 1
+[0608/125750.193:VERBOSE1:layout_shift_tracker.cc(627)] in "http://ironinternalfraqbc8wsa1xvpfvjcrg.com/", layout shift of 0.0149658 reported; cumulative score is 0.0149658
+[0608/125750.208:WARNING:task_impl.cc(20)] No task runner for threadId 6
+[0608/125750.450:VERBOSE1:frame_host_impl.cc(492)] frame 17179869185 [4,1] (main) detached (reason=NEW_MAIN_FRAME, is_connected=1)
+[0608/125752.940:VERBOSE1:network_delegate.cc(34)] NetworkDelegate::NotifyBeforeURLRequest: https://dns.google/dns-query?dns=AAABAAABAAAAAAABA3d3dwdnc3RhdGljA2NvbQAAAQABAAApEAAAAAAAAFQADABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+[0608/125808.080:VERBOSE1:media_stream_manager.cc(1113)] MSPL::OnSpeedLimitChange({this=000001B4000717B8}, {new_limit=57})
+[0608/125809.085:VERBOSE1:media_stream_manager.cc(1113)] MSPL::OnSpeedLimitChange({this=000001B4000717B8}, {new_limit=58})
+[0608/125813.294:VERBOSE1:media_stream_manager.cc(1113)] MSPL::OnSpeedLimitChange({this=000001B4000717B8}, {new_limit=60})
+[0608/125814.272:VERBOSE1:media_stream_manager.cc(1113)] MSPL::OnSpeedLimitChange({this=000001B4000717B8}, {new_limit=61})
