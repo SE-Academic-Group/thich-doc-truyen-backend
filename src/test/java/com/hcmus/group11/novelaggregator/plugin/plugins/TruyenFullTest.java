@@ -207,7 +207,6 @@ class TruyenFullTest {
     }
 
 
-
     // NormalizeString
     @Test
     void testNormalizeString() {
