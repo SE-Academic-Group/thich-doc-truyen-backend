@@ -1,19 +1,15 @@
 package com.hcmus.group11.novelaggregator.plugin.plugins;
 
-import com.hcmus.group11.novelaggregator.exception.type.HttpException;
 import com.hcmus.group11.novelaggregator.plugin.BaseCrawler;
 import com.hcmus.group11.novelaggregator.type.*;
 import com.hcmus.group11.novelaggregator.util.RequestAttributeUtil;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
 public class ThichTruyen extends BaseCrawler {
 
     public ThichTruyen() {
@@ -57,11 +53,11 @@ public class ThichTruyen extends BaseCrawler {
         String title = html.selectFirst("h1.story-intro-title").text();
         String author = html.selectFirst("p.story-intro-author a").text();
         String image = pluginUrl + "/" + html.selectFirst("div.story-intro-image img").attr("src");
-        String url = html.baseUri() +  html.selectFirst("h1.story-intro-title a").attr("href");
+        String url = html.baseUri() + html.selectFirst("h1.story-intro-title a").attr("href");
         String nChapterText = html.selectFirst("p.story-intro-chapper").text().replaceAll("[^0-9]", "");
         Integer nChapter = Integer.parseInt(nChapterText);
         String description = html.selectFirst("div#tab-over div.tab-text p").text();
-        if(description.equals("Đọc Truyện")){
+        if (description.equals("Đọc Truyện")) {
             description = html.selectFirst("div#tab-over div.tab-text").text();
         }
 
@@ -96,7 +92,7 @@ public class ThichTruyen extends BaseCrawler {
         String currentPageString = html.selectFirst("div.pagination strong").text();
         Integer currentPage = Integer.parseInt(currentPageString);
 
-        if(currentPage > maxPage) {
+        if (currentPage > maxPage) {
             maxPage = currentPage;
         }
 
@@ -118,21 +114,19 @@ public class ThichTruyen extends BaseCrawler {
         String content = html.selectFirst("div.story-detail-content").text();
         content = content.replaceAll("(?i)<br\\s*/?>", "");
 
-        ChapterDetail chapterDetail = new ChapterDetail(novelTitle,title, url, content);
+        ChapterDetail chapterDetail = new ChapterDetail(novelTitle, title, url, content);
 
         String nextChapter = html.selectFirst("div.next-previous a").attr("href");
-        if(nextChapter.contains("javascript")){
+        if (nextChapter.contains("javascript")) {
             nextChapter = null;
-        }
-        else{
+        } else {
             nextChapter = this.pluginUrl + "/" + nextChapter;
         }
 
         String previousChapter = html.selectFirst("div.prev-previous a").attr("href");
-        if(previousChapter.contains("javascript")){
+        if (previousChapter.contains("javascript")) {
             previousChapter = null;
-        }
-        else{
+        } else {
             previousChapter = this.pluginUrl + "/" + previousChapter;
         }
 
