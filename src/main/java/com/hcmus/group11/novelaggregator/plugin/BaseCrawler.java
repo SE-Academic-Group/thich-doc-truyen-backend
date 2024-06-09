@@ -1,10 +1,8 @@
 package com.hcmus.group11.novelaggregator.plugin;
 
 import com.hcmus.group11.novelaggregator.exception.type.HttpException;
-import com.hcmus.group11.novelaggregator.type.ChapterDetail;
-import com.hcmus.group11.novelaggregator.type.NovelDetail;
-import com.hcmus.group11.novelaggregator.type.NovelSearchResult;
-import com.hcmus.group11.novelaggregator.type.ResponseMetadata;
+import com.hcmus.group11.novelaggregator.type.*;
+import com.hcmus.group11.novelaggregator.util.LevenshteinDistance;
 import com.hcmus.group11.novelaggregator.util.RequestAttributeUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,6 +12,7 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -151,6 +150,69 @@ public abstract class BaseCrawler implements INovelPlugin {
         throw HttpException.SERVICE_UNAVAILABLE("SERVICE_UNAVAILABLE", "Service is temporarily unavailable");
     }
 
+    @Override
+    public NovelSearchResult findSimilarNovel(String title, String author) {
+        String searchUrl = buildSearchUrl(title, 1);
+        Document html = getHtml(searchUrl);
+
+        title = title.replace(" ", "");
+
+        List<NovelSearchResult> novelSearchResults = parseSearchHTML(html);
+
+        NovelSearchResult result = null;
+        int bestDistance = Integer.MAX_VALUE;
+
+        for (NovelSearchResult novelSearchResult : novelSearchResults) {
+            String currentTitle = novelSearchResult.getTitle();
+            String currentAuthor = novelSearchResult.getAuthor();
+
+            if (currentTitle == null || currentAuthor == null) {
+                continue;
+            }
+
+            String normalizedTitle = normalizeString(currentTitle, false);
+            String normalizedAuthor = normalizeString(currentAuthor, false);
+
+            int distanceTitle = LevenshteinDistance.computeLevenshteinDistance(normalizedTitle, title);
+            int distanceAuthor = LevenshteinDistance.computeLevenshteinDistance(normalizedAuthor, author);
+
+            if (distanceTitle < 5 && distanceAuthor < 2 && distanceTitle + distanceAuthor < bestDistance) {
+                bestDistance = distanceAuthor + distanceTitle;
+                result = novelSearchResult;
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public ChapterInfo getChapterInfoByNovelUrlAndChapterIndex(String novelUrl, String chapterIndex) {
+        ChapterInfo result = null;
+        List<ChapterInfo> chapterInfoList = getFullChapterList(novelUrl);
+
+        for (ChapterInfo chapterInfo : chapterInfoList) {
+            if (chapterInfo.getIndex().equals(chapterIndex)) {
+                result = chapterInfo;
+                break;
+            }
+        }
+
+        return result;
+    }
+
+    public Object convertHtmlToEpub(String url) throws IOException {
+        Document html = getHtml(url);
+        return convertToEpub(html);
+    }
+    public Object convertHtmlToPdf(String url) throws IOException {
+        Document html = getHtml(url);
+        return convertToPDF(html);
+    }
+    public Object convertHtmlToImg(String url) throws Exception {
+        Document html = getHtml(url);
+        return convertToImg(html);
+    }
+
     protected abstract String buildSearchUrl(String keyword, Integer page);
 
     protected abstract List<NovelSearchResult> parseSearchHTML(Document html);
@@ -162,4 +224,11 @@ public abstract class BaseCrawler implements INovelPlugin {
     }
 
     protected abstract ChapterDetail parseChapterDetailHTML(Document html);
+
+    protected abstract Object convertToEpub(Document html) throws IOException;
+
+    protected abstract Object convertToPDF(Document html) throws IOException;
+
+    protected abstract Object convertToImg(Document html) throws Exception;
+
 }
