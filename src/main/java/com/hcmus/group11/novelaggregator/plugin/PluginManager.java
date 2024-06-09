@@ -15,7 +15,6 @@ import java.util.Map;
 @Service
 public class PluginManager {
     private PluginLoader<INovelPlugin> pluginLoader;
-    private Map<String, INovelPlugin> novelPluginMap;
     private List<DownloadOptions> downloadOptionsList;
 
     public PluginManager(PluginLoader<INovelPlugin> pluginLoader, List<DownloadOptions> downloadOptionsList) {
