@@ -11,10 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-interface TestInterface {
-    void test();
-}
-
 @Service
 public class PluginManager {
     private PluginLoader<INovelPlugin> pluginLoader;
