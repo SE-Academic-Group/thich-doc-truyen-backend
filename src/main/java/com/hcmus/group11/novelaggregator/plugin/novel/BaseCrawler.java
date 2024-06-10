@@ -1,4 +1,4 @@
-package com.hcmus.group11.novelaggregator.plugin;
+package com.hcmus.group11.novelaggregator.plugin.novel;
 
 import com.hcmus.group11.novelaggregator.exception.type.HttpException;
 import com.hcmus.group11.novelaggregator.type.*;
@@ -204,10 +204,12 @@ public abstract class BaseCrawler implements INovelPlugin {
         Document html = getHtml(url);
         return convertToEpub(html);
     }
+
     public Object convertHtmlToPdf(String url) throws IOException {
         Document html = getHtml(url);
         return convertToPDF(html);
     }
+
     public Object convertHtmlToImg(String url) throws Exception {
         Document html = getHtml(url);
         return convertToImg(html);

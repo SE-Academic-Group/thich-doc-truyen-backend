@@ -1,6 +1,6 @@
 package com.hcmus.group11.novelaggregator.config;
 
-import com.hcmus.group11.novelaggregator.plugin.INovelPlugin;
+import com.hcmus.group11.novelaggregator.plugin.novel.INovelPlugin;
 import com.hcmus.group11.novelaggregator.type.PluginLoader;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

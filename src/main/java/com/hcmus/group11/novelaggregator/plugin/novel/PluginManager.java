@@ -1,4 +1,4 @@
-package com.hcmus.group11.novelaggregator.plugin;
+package com.hcmus.group11.novelaggregator.plugin.novel;
 
 import com.hcmus.group11.novelaggregator.exception.type.HttpException;
 import com.hcmus.group11.novelaggregator.type.DownloadOptions;

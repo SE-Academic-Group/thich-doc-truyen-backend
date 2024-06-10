@@ -1,10 +1,9 @@
-package com.hcmus.group11.novelaggregator.plugin.plugins;
+package com.hcmus.group11.novelaggregator.plugin.novel.plugins;
 
 import com.aspose.words.HtmlLoadOptions;
 import com.aspose.words.LoadOptions;
 import com.aspose.words.SaveFormat;
-import com.hcmus.group11.novelaggregator.exception.type.HttpException;
-import com.hcmus.group11.novelaggregator.plugin.BaseCrawler;
+import com.hcmus.group11.novelaggregator.plugin.novel.BaseCrawler;
 import com.hcmus.group11.novelaggregator.type.*;
 import com.hcmus.group11.novelaggregator.util.RequestAttributeUtil;
 import com.hcmus.group11.novelaggregator.util.UnicodeRemover;
@@ -19,13 +18,10 @@ import nl.siegmann.epublib.epub.EpubWriter;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
 
 import java.io.*;
@@ -41,6 +37,7 @@ import java.util.zip.ZipOutputStream;
 public class ThichTruyen extends BaseCrawler {
 
     String licenseKey = "IRONSU ITE.PHUOCNHANTRANONE.GMAIL.COM.19627-FC5FEE9C2D-INXGX-VYU7MHFUBMGB-ED3PKWHT3AMU-UTUZKSBPC72L-CX5JGC3TRI7V-S2AI7AMHQ7JT-DZL6THKRKTWV-5DP5YB-T2HOSDH6JXCMUA-DEPLOYMENT.TRIAL-5ESGQZ.TRIAL.EXPIRES.04.JUL.2024";
+
     public ThichTruyen() {
         pluginName = "thichTruyen";
         pluginUrl = "https://thichtruyen.vn";
@@ -248,6 +245,7 @@ public class ThichTruyen extends BaseCrawler {
 
         return str;
     }
+
     @Override
     protected Object convertToEpub(Document html) throws IOException {
 
@@ -408,7 +406,7 @@ public class ThichTruyen extends BaseCrawler {
                 authorNameHtml +
                 chapterNameHtml +
                 "<p>----------------</p>" +
-                storyDetailContent.html()+
+                storyDetailContent.html() +
                 "</body>\n" +
                 "</html>";
 

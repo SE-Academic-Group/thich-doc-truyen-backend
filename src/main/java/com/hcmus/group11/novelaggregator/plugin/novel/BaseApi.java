@@ -1,4 +1,4 @@
-package com.hcmus.group11.novelaggregator.plugin;
+package com.hcmus.group11.novelaggregator.plugin.novel;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hcmus.group11.novelaggregator.exception.type.HttpException;
@@ -139,10 +139,12 @@ public abstract class BaseApi implements INovelPlugin {
         String jsonDetailString = getJsonString(url);
         return convertToEpub(jsonDetailString);
     }
+
     public Object convertHtmlToPdf(String url) {
         String jsonDetailString = getJsonString(url);
         return convertToPdf(jsonDetailString);
     }
+
     public Object convertHtmlToImg(String url) {
         String jsonDetailString = getJsonString(url);
         return convertToImg(jsonDetailString);

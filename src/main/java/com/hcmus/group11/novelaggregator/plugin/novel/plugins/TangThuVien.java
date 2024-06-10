@@ -1,17 +1,16 @@
-package com.hcmus.group11.novelaggregator.plugin.plugins;
+package com.hcmus.group11.novelaggregator.plugin.novel.plugins;
 
 import com.aspose.words.HtmlLoadOptions;
 import com.aspose.words.LoadOptions;
 import com.aspose.words.SaveFormat;
 import com.hcmus.group11.novelaggregator.exception.type.HttpException;
-import com.hcmus.group11.novelaggregator.plugin.BaseCrawler;
+import com.hcmus.group11.novelaggregator.plugin.novel.BaseCrawler;
 import com.hcmus.group11.novelaggregator.type.*;
 import com.hcmus.group11.novelaggregator.util.RequestAttributeUtil;
 import com.hcmus.group11.novelaggregator.util.UnicodeRemover;
 import com.ironsoftware.ironpdf.License;
 import com.ironsoftware.ironpdf.PdfDocument;
 import com.ironsoftware.ironpdf.Settings;
-import nl.siegmann.epublib.domain.Author;
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Metadata;
 import nl.siegmann.epublib.domain.Resource;
@@ -23,7 +22,6 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
 
 import java.io.*;
@@ -42,6 +40,7 @@ import java.util.zip.ZipOutputStream;
 public class TangThuVien extends BaseCrawler {
 
     String licenseKey = "IRONSU ITE.PHUOCNHANTRANONE.GMAIL.COM.19627-FC5FEE9C2D-INXGX-VYU7MHFUBMGB-ED3PKWHT3AMU-UTUZKSBPC72L-CX5JGC3TRI7V-S2AI7AMHQ7JT-DZL6THKRKTWV-5DP5YB-T2HOSDH6JXCMUA-DEPLOYMENT.TRIAL-5ESGQZ.TRIAL.EXPIRES.04.JUL.2024";
+
     public TangThuVien() {
         pluginName = "tangThuVien";
         pluginUrl = "https://truyen.tangthuvien.vn";
@@ -343,6 +342,7 @@ public class TangThuVien extends BaseCrawler {
 
         return str;
     }
+
     @Override
     protected Object convertToEpub(Document html) {
         Element header = html.selectFirst("head");
@@ -371,7 +371,7 @@ public class TangThuVien extends BaseCrawler {
                 novelNameHtml +
                 chapterNameHtml +
                 "<p>----------------</p>" +
-                storyDetailContentHtml+
+                storyDetailContentHtml +
                 "</body>\n" +
                 "</html>";
 

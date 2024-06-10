@@ -188,7 +188,7 @@ public class NovelController {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class)))
             }
     )
-    @GetMapping( "${download.paths.EPUB}")
+    @GetMapping("${download.paths.EPUB}")
     public Object convertHtmlToEpub(@RequestParam() String url) throws Exception {
         return novelService.convertHtmlToEpub(url);
     }
@@ -207,7 +207,7 @@ public class NovelController {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class)))
             }
     )
-    @GetMapping( "${download.paths.PDF}")
+    @GetMapping("${download.paths.PDF}")
     public Object convertHtmlToPdf(@RequestParam() String url) throws Exception {
         return novelService.convertHtmlToPdf(url);
     }
@@ -245,6 +245,11 @@ public class NovelController {
     @GetMapping("/download-options")
     public List<DownloadOptions> getDownloadOptions() {
         return novelService.getDownloadOptionsList();
+    }
+
+    @GetMapping("/export")
+    public Object exportNovel(@RequestParam() String url, @RequestParam() String type) throws Exception {
+        return novelService.exportNovel(url, type);
     }
 
 }

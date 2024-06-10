@@ -1,7 +1,7 @@
 package com.hcmus.group11.novelaggregator.service;
 
-import com.hcmus.group11.novelaggregator.plugin.INovelPlugin;
-import com.hcmus.group11.novelaggregator.plugin.PluginManager;
+import com.hcmus.group11.novelaggregator.plugin.novel.INovelPlugin;
+import com.hcmus.group11.novelaggregator.plugin.novel.PluginManager;
 import com.hcmus.group11.novelaggregator.type.*;
 import org.springframework.stereotype.Service;
 
@@ -117,4 +117,17 @@ public class NovelService {
         return pluginManager.getDownloadOptionsList();
     }
 
+    public Object exportNovel(String url, String type) throws Exception {
+        INovelPlugin plugin = pluginManager.getPluginByNovelUrl(url);
+        switch (type) {
+            case "epub":
+                return plugin.convertHtmlToEpub(url);
+            case "pdf":
+                return plugin.convertHtmlToPdf(url);
+            case "img":
+                return plugin.convertHtmlToImg(url);
+            default:
+                throw new RuntimeException("Invalid type");
+        }
+    }
 }

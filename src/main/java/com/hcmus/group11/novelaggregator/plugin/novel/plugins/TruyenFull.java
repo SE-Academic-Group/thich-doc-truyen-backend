@@ -1,4 +1,4 @@
-package com.hcmus.group11.novelaggregator.plugin.plugins;
+package com.hcmus.group11.novelaggregator.plugin.novel.plugins;
 
 import com.aspose.words.HtmlLoadOptions;
 import com.aspose.words.LoadOptions;
@@ -7,9 +7,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hcmus.group11.novelaggregator.exception.type.HttpException;
-import com.hcmus.group11.novelaggregator.plugin.BaseApi;
+import com.hcmus.group11.novelaggregator.plugin.novel.BaseApi;
 import com.hcmus.group11.novelaggregator.type.*;
-import com.hcmus.group11.novelaggregator.util.LevenshteinDistance;
 import com.hcmus.group11.novelaggregator.util.RequestAttributeUtil;
 import com.hcmus.group11.novelaggregator.util.UnicodeRemover;
 import com.ironsoftware.ironpdf.License;
@@ -23,7 +22,6 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
 
 import java.io.*;
@@ -41,6 +39,7 @@ import java.util.zip.ZipOutputStream;
 public class TruyenFull extends BaseApi {
 
     String licenseKey = "IRONSU ITE.PHUOCNHANTRANONE.GMAIL.COM.19627-FC5FEE9C2D-INXGX-VYU7MHFUBMGB-ED3PKWHT3AMU-UTUZKSBPC72L-CX5JGC3TRI7V-S2AI7AMHQ7JT-DZL6THKRKTWV-5DP5YB-T2HOSDH6JXCMUA-DEPLOYMENT.TRIAL-5ESGQZ.TRIAL.EXPIRES.04.JUL.2024";
+
     public TruyenFull() {
         this.pluginName = "truyenFull";
         this.pluginUrl = "https://truyenfull.vn";
@@ -391,7 +390,7 @@ public class TruyenFull extends BaseApi {
                 System.out.println((String) data.get("chapter_name"));
                 System.out.println((String) data.get("content"));
 
-                String story_name =  (String) data.get("story_name");
+                String story_name = (String) data.get("story_name");
                 String chapter_name = (String) data.get("chapter_name");
                 String storyDetailContent = (String) data.get("content");
 
@@ -506,8 +505,7 @@ public class TruyenFull extends BaseApi {
 
                 return responseEntity;
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
