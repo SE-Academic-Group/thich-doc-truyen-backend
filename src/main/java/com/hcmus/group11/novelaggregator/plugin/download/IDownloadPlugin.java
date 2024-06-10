@@ -1,11 +1,9 @@
 package com.hcmus.group11.novelaggregator.plugin.download;
 
-import java.io.IOException;
+import com.hcmus.group11.novelaggregator.type.NovelDownloadInfo;
 
 public interface IDownloadPlugin {
-    Object convertHtmlToPdf(String url) throws IOException;
+    Object execute(NovelDownloadInfo info) throws Exception;
 
-    Object convertHtmlToEpub(String url) throws IOException;
-
-    Object convertHtmlToImg(String url) throws Exception;
+    String getName();
 }

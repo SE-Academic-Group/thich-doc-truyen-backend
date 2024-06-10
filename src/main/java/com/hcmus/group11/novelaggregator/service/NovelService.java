@@ -1,11 +1,11 @@
 package com.hcmus.group11.novelaggregator.service;
 
+import com.hcmus.group11.novelaggregator.plugin.PluginManager;
+import com.hcmus.group11.novelaggregator.plugin.download.IDownloadPlugin;
 import com.hcmus.group11.novelaggregator.plugin.novel.INovelPlugin;
-import com.hcmus.group11.novelaggregator.plugin.novel.PluginManager;
 import com.hcmus.group11.novelaggregator.type.*;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -98,36 +98,14 @@ public class NovelService {
         return switchPluginMetaDataList;
     }
 
-    public Object convertHtmlToEpub(String url) throws IOException {
-        INovelPlugin plugin = pluginManager.getPluginByNovelUrl(url);
-        return plugin.convertHtmlToEpub(url);
-    }
-
-    public Object convertHtmlToPdf(String url) throws IOException {
-        INovelPlugin plugin = pluginManager.getPluginByNovelUrl(url);
-        return plugin.convertHtmlToPdf(url);
-    }
-
-    public Object convertHtmlToImg(String url) throws Exception {
-        INovelPlugin plugin = pluginManager.getPluginByNovelUrl(url);
-        return plugin.convertHtmlToImg(url);
-    }
-
-    public List<DownloadOptions> getDownloadOptionsList() {
-        return pluginManager.getDownloadOptionsList();
+    public List<DownloadPluginMetadata> getDownloadOptionsList() {
+        return pluginManager.getDownloadPluginMetadataList();
     }
 
     public Object exportNovel(String url, String type) throws Exception {
         INovelPlugin plugin = pluginManager.getPluginByNovelUrl(url);
-        switch (type) {
-            case "epub":
-                return plugin.convertHtmlToEpub(url);
-            case "pdf":
-                return plugin.convertHtmlToPdf(url);
-            case "img":
-                return plugin.convertHtmlToImg(url);
-            default:
-                throw new RuntimeException("Invalid type");
-        }
+        NovelDownloadInfo novelDownloadInfo = plugin.getNovelDownloadInfo(url);
+        IDownloadPlugin downloadPlugin = pluginManager.getDownloadPlugin(type);
+        return downloadPlugin.execute(novelDownloadInfo);
     }
 }

@@ -12,7 +12,6 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -25,6 +24,10 @@ public abstract class BaseCrawler implements INovelPlugin {
     protected String pluginName;
     protected String pluginUrl;
 
+    @Override
+    public String getPluginName() {
+        return this.getClass().getSimpleName().toLowerCase();
+    }
 
     public List<NovelSearchResult> search(String keyword, Integer page) {
         String searchUrl = buildSearchUrl(keyword, page);
@@ -200,21 +203,6 @@ public abstract class BaseCrawler implements INovelPlugin {
         return result;
     }
 
-    public Object convertHtmlToEpub(String url) throws IOException {
-        Document html = getHtml(url);
-        return convertToEpub(html);
-    }
-
-    public Object convertHtmlToPdf(String url) throws IOException {
-        Document html = getHtml(url);
-        return convertToPDF(html);
-    }
-
-    public Object convertHtmlToImg(String url) throws Exception {
-        Document html = getHtml(url);
-        return convertToImg(html);
-    }
-
     protected abstract String buildSearchUrl(String keyword, Integer page);
 
     protected abstract List<NovelSearchResult> parseSearchHTML(Document html);
@@ -226,11 +214,4 @@ public abstract class BaseCrawler implements INovelPlugin {
     }
 
     protected abstract ChapterDetail parseChapterDetailHTML(Document html);
-
-    protected abstract Object convertToEpub(Document html) throws IOException;
-
-    protected abstract Object convertToPDF(Document html) throws IOException;
-
-    protected abstract Object convertToImg(Document html) throws Exception;
-
 }

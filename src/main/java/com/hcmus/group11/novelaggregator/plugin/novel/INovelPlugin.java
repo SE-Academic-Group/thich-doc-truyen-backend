@@ -1,9 +1,7 @@
 package com.hcmus.group11.novelaggregator.plugin.novel;
 
-import com.hcmus.group11.novelaggregator.type.ChapterDetail;
-import com.hcmus.group11.novelaggregator.type.ChapterInfo;
-import com.hcmus.group11.novelaggregator.type.NovelDetail;
-import com.hcmus.group11.novelaggregator.type.NovelSearchResult;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.hcmus.group11.novelaggregator.type.*;
 
 import java.util.List;
 
@@ -27,4 +25,6 @@ public interface INovelPlugin {
     NovelSearchResult findSimilarNovel(String title, String author);
 
     ChapterInfo getChapterInfoByNovelUrlAndChapterIndex(String novelUrl, String chapterIndex);
+
+    NovelDownloadInfo getNovelDownloadInfo(String url) throws JsonProcessingException;
 }

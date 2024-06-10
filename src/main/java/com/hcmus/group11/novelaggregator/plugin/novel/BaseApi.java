@@ -1,6 +1,5 @@
 package com.hcmus.group11.novelaggregator.plugin.novel;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hcmus.group11.novelaggregator.exception.type.HttpException;
 import com.hcmus.group11.novelaggregator.type.ChapterDetail;
 import com.hcmus.group11.novelaggregator.type.ChapterInfo;
@@ -19,7 +18,7 @@ public abstract class BaseApi implements INovelPlugin {
     protected String pluginUrl;
 
     public String getPluginName() {
-        return pluginName;
+        return this.getClass().getSimpleName().toLowerCase();
     }
 
     public String getPluginUrl() {
@@ -135,22 +134,6 @@ public abstract class BaseApi implements INovelPlugin {
         return result;
     }
 
-    public Object convertHtmlToEpub(String url) throws JsonProcessingException {
-        String jsonDetailString = getJsonString(url);
-        return convertToEpub(jsonDetailString);
-    }
-
-    public Object convertHtmlToPdf(String url) {
-        String jsonDetailString = getJsonString(url);
-        return convertToPdf(jsonDetailString);
-    }
-
-    public Object convertHtmlToImg(String url) {
-        String jsonDetailString = getJsonString(url);
-        return convertToImg(jsonDetailString);
-    }
-
-
     protected abstract ChapterDetail getChapterDetailFromJsonString(String jsonChapterDetail);
 
     protected abstract List<ChapterInfo> getChapterListFromJsonString(String jsonChapterList);
@@ -168,14 +151,4 @@ public abstract class BaseApi implements INovelPlugin {
     protected abstract String buildChapterDetailUrl(Integer chapterId);
 
     protected abstract void addMetaData(Map<String, Optional> map);
-
-    protected List<NovelSearchResult> filterSearchResults(List<NovelSearchResult> novelSearchResults, String keyword) {
-        return novelSearchResults;
-    }
-
-    protected abstract Object convertToEpub(String jsonString) throws JsonProcessingException;
-
-    protected abstract Object convertToPdf(String jsonString);
-
-    protected abstract Object convertToImg(String jsonString);
 }

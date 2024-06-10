@@ -174,63 +174,6 @@ public class NovelController {
         return novelService.getSwitchPluginMetaData(chapterIndex, novelUrl);
     }
 
-    @Operation(summary = "Convert HTML to EPUB",
-            parameters = {
-                    @Parameter(name = "url", description = "URL of the HTML", required = true, example = "http://example.com/novel")
-            },
-            responses = {
-                    @ApiResponse(description = "EPUB file", responseCode = "200", content = @Content(mediaType = "application/epub+zip")),
-                    @ApiResponse(responseCode = "400", description = "Invalid URL",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class))),
-                    @ApiResponse(responseCode = "404", description = "Not Found",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class))),
-                    @ApiResponse(responseCode = "500", description = "Internal Server Error",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class)))
-            }
-    )
-    @GetMapping("${download.paths.EPUB}")
-    public Object convertHtmlToEpub(@RequestParam() String url) throws Exception {
-        return novelService.convertHtmlToEpub(url);
-    }
-
-    @Operation(summary = "Convert HTML to PDF",
-            parameters = {
-                    @Parameter(name = "url", description = "URL of the HTML", required = true, example = "http://example.com/novel")
-            },
-            responses = {
-                    @ApiResponse(description = "PDF file", responseCode = "200", content = @Content(mediaType = "application/pdf")),
-                    @ApiResponse(responseCode = "400", description = "Invalid URL",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class))),
-                    @ApiResponse(responseCode = "404", description = "Not Found",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class))),
-                    @ApiResponse(responseCode = "500", description = "Internal Server Error",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class)))
-            }
-    )
-    @GetMapping("${download.paths.PDF}")
-    public Object convertHtmlToPdf(@RequestParam() String url) throws Exception {
-        return novelService.convertHtmlToPdf(url);
-    }
-
-    @Operation(summary = "Convert HTML to Image",
-            parameters = {
-                    @Parameter(name = "url", description = "URL of the HTML", required = true, example = "http://example.com/novel")
-            },
-            responses = {
-                    @ApiResponse(description = "Image file", responseCode = "200", content = @Content(mediaType = "image/png")),
-                    @ApiResponse(responseCode = "400", description = "Invalid URL",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class))),
-                    @ApiResponse(responseCode = "404", description = "Not Found",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class))),
-                    @ApiResponse(responseCode = "500", description = "Internal Server Error",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class)))
-            }
-    )
-    @GetMapping("${download.paths.IMAGES}")
-    public Object convertHtmlToImg(@RequestParam() String url) throws Exception {
-        return novelService.convertHtmlToImg(url);
-    }
-
     @Operation(summary = "Get download options",
             responses = {
                     @ApiResponse(description = "list chapter download options",
@@ -243,13 +186,27 @@ public class NovelController {
             }
     )
     @GetMapping("/download-options")
-    public List<DownloadOptions> getDownloadOptions() {
+    public List<DownloadPluginMetadata> getDownloadOptions() {
         return novelService.getDownloadOptionsList();
     }
 
-    @GetMapping("/export")
-    public Object exportNovel(@RequestParam() String url, @RequestParam() String type) throws Exception {
+    @Operation(summary = "Download novel",
+            parameters = {
+                    @Parameter(name = "url", description = "URL of the novel", required = true, example = "http://example.com/novel"),
+                    @Parameter(name = "type", description = "Type of download", required = true, example = "epub")
+            },
+            responses = {
+                    @ApiResponse(description = "Downloaded file",
+                            responseCode = "200",
+                            content = @Content(mediaType = "application/octet-stream")),
+                    @ApiResponse(responseCode = "400", description = "Invalid URL or type",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class))),
+                    @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class)))
+            }
+    )
+    @GetMapping("/download")
+    public Object downloadNovel(@RequestParam() String url, @RequestParam() String type) throws Exception {
         return novelService.exportNovel(url, type);
     }
-
 }
