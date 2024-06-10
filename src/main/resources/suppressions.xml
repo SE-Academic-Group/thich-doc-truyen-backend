@@ -1,0 +1,8 @@
+<!DOCTYPE suppressions PUBLIC "-//Puppy Crawl//DTD Suppressions 1.1//EN"
+        "https://checkstyle.org/dtds/suppressions_1_1.dtd">
+<suppressions>
+    <suppress
+            files="src[\\/]main[\\/]java[\\/]com[\\/]hcmus[\\/]group11[\\/]novelaggregator[\\/]exception[\\/]type[\\/].*"
+            checks=".*"/>
+</suppressions>
+
