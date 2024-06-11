@@ -1,5 +1,9 @@
-package com.hcmus.group11.novelaggregator.type;
+package com.hcmus.group11.novelaggregator.plugin;
 
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.tools.JavaCompiler;
@@ -20,7 +24,8 @@ import java.util.logging.Logger;
 public class PluginLoader<T> {
     private static final Logger LOGGER = Logger.getLogger(PluginLoader.class.getName());
 
-    private final Map<String, T> loadedPlugins = new ConcurrentHashMap<>();
+    private final Class<T> TClass;
+    private final ConfigurableApplicationContext applicationContext;
     private String packageName;
     private final Path pluginsDir;
     private final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
@@ -29,8 +34,10 @@ public class PluginLoader<T> {
     private Timer processDelayTimer = null;
     private static final long DELAY = 2000; // milliseconds
 
-    public PluginLoader(String packageName) throws IOException {
+    public PluginLoader(String packageName, Class<T> TClass, ConfigurableApplicationContext applicationContext) throws IOException {
         this.packageName = packageName;
+        this.TClass = TClass;
+        this.applicationContext = applicationContext;
         pluginsDir = Paths.get("src/main/java/" + packageName.replace(".", "/"));
 
         clearPlugindirectory();
@@ -57,8 +64,9 @@ public class PluginLoader<T> {
     private void loadExistingPlugins() {
         try {
             Files.list(pluginsDir).forEach(file -> {
+                String className = extractClassName(file.toFile());
                 if (file.toString().endsWith(".java")) {
-                    addTask(extractClassName(file.toFile()), () -> loadT(file.toFile()));
+                    addTask(className, () -> loadT(file.toFile()));
                 }
             });
             runAllTasks(); // Run tasks immediately to load existing plugins
@@ -67,25 +75,29 @@ public class PluginLoader<T> {
         }
     }
 
-    private void watchPluginsDirectory() throws IOException {
-        WatchService watchService = FileSystems.getDefault().newWatchService();
-        pluginsDir.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
+    private void watchPluginsDirectory() {
+        try {
+            WatchService watchService = FileSystems.getDefault().newWatchService();
+            pluginsDir.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
 
-        Thread watchThread = new Thread(() -> {
-            try {
-                WatchKey key;
-                while ((key = watchService.take()) != null) {
-                    for (WatchEvent<?> event : key.pollEvents()) {
-                        handleWatchEvent(event);
+            Thread watchThread = new Thread(() -> {
+                try {
+                    WatchKey key;
+                    while ((key = watchService.take()) != null) {
+                        for (WatchEvent<?> event : key.pollEvents()) {
+                            handleWatchEvent(event);
+                        }
+                        key.reset();
                     }
-                    key.reset();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    LOGGER.log(Level.WARNING, "Watch thread interrupted", e);
                 }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                LOGGER.log(Level.WARNING, "Watch thread interrupted", e);
-            }
-        });
-        watchThread.start();
+            });
+            watchThread.start();
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Error watching plugin directory", e);
+        }
     }
 
     private void handleWatchEvent(WatchEvent<?> event) {
@@ -106,7 +118,7 @@ public class PluginLoader<T> {
     }
 
     private void addTask(String className, Runnable task) {
-        tasks.put(className, task);
+        tasks.put(className.toLowerCase(), task);
 
         if (processDelayTimer != null) {
             processDelayTimer.cancel();
@@ -136,9 +148,14 @@ public class PluginLoader<T> {
                 try (URLClassLoader classLoader = new URLClassLoader(urls, getClass().getClassLoader())) {
                     String className = extractClassName(javaFile);
                     Class<?> clazz = classLoader.loadClass(packageName + "." + className);
-                    T plugin = (T) clazz.getDeclaredConstructor().newInstance();
-                    loadedPlugins.put(className, plugin);
-                    LOGGER.log(Level.INFO, "Loaded plugin: " + className);
+
+                    if (TClass.isAssignableFrom(clazz)) {
+                        unregisterBean(className);
+                        registerBean(className, clazz);
+                        LOGGER.log(Level.INFO, "Loaded plugin: " + className);
+                    } else {
+                        LOGGER.log(Level.SEVERE, "Class does not implement the correct interface: " + javaFile.getName());
+                    }
                 }
             } else {
                 LOGGER.log(Level.SEVERE, "Failed to compile plugin: " + javaFile.getName());
@@ -148,11 +165,23 @@ public class PluginLoader<T> {
         }
     }
 
+    private void registerBean(String beanName, Class<?> beanClass) {
+        BeanDefinitionRegistry beanFactory = (BeanDefinitionRegistry) applicationContext.getBeanFactory();
+        BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(beanClass);
+        BeanDefinition beanDefinition = builder.getRawBeanDefinition();
+        beanFactory.registerBeanDefinition(beanName, beanDefinition);
+    }
+
     public void unloadT(File file) {
         String className = extractClassName(file);
-        T plugin = loadedPlugins.remove(className);
-        if (plugin != null) {
-            LOGGER.log(Level.INFO, "Unloaded plugin: " + className);
+        unregisterBean(className);
+        LOGGER.log(Level.INFO, "Unloaded plugin: " + className);
+    }
+
+    private void unregisterBean(String beanName) {
+        BeanDefinitionRegistry beanFactory = (BeanDefinitionRegistry) applicationContext.getBeanFactory();
+        if (beanFactory.containsBeanDefinition(beanName)) {
+            beanFactory.removeBeanDefinition(beanName);
         }
     }
 
@@ -162,6 +191,6 @@ public class PluginLoader<T> {
     }
 
     public Map<String, T> getPlugins() {
-        return loadedPlugins;
+        return applicationContext.getBeansOfType(TClass);
     }
 }

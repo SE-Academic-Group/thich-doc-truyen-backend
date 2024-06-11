@@ -1,8 +1,10 @@
 package com.hcmus.group11.novelaggregator.plugin;
 
 import com.hcmus.group11.novelaggregator.exception.type.HttpException;
+import com.hcmus.group11.novelaggregator.plugin.download.IDownloadPlugin;
+import com.hcmus.group11.novelaggregator.plugin.novel.INovelPlugin;
 import com.hcmus.group11.novelaggregator.type.DownloadOptions;
-import com.hcmus.group11.novelaggregator.type.PluginLoader;
+import com.hcmus.group11.novelaggregator.type.DownloadPluginMetadata;
 import com.hcmus.group11.novelaggregator.type.PluginMetadata;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +17,12 @@ import java.util.Map;
 @Service
 public class PluginManager {
     private PluginLoader<INovelPlugin> pluginLoader;
+    private PluginLoader<IDownloadPlugin> downloadPluginLoader;
     private List<DownloadOptions> downloadOptionsList;
 
-    public PluginManager(PluginLoader<INovelPlugin> pluginLoader, List<DownloadOptions> downloadOptionsList) {
+    public PluginManager(PluginLoader<INovelPlugin> pluginLoader, PluginLoader<IDownloadPlugin> downloadPluginLoader, List<DownloadOptions> downloadOptionsList) {
         this.pluginLoader = pluginLoader;
+        this.downloadPluginLoader = downloadPluginLoader;
         this.downloadOptionsList = downloadOptionsList;
     }
 
@@ -67,7 +71,24 @@ public class PluginManager {
         }
     }
 
-    public List<DownloadOptions> getDownloadOptionsList() {
-        return downloadOptionsList;
+    public IDownloadPlugin getDownloadPlugin(String pluginName) {
+        IDownloadPlugin plugin = downloadPluginLoader.getPlugins().get(pluginName);
+        if (plugin == null) {
+            throw HttpException.NOT_FOUND("NOT_FOUND", "Plugin not found: " + pluginName);
+        }
+
+        return plugin;
+    }
+
+    public List<DownloadPluginMetadata> getDownloadPluginMetadataList() {
+        List<DownloadPluginMetadata> downloadPluginMetadataList = new ArrayList<>();
+        Map<String, IDownloadPlugin> downloadPluginMap = downloadPluginLoader.getPlugins();
+        for (IDownloadPlugin plugin : downloadPluginMap.values()) {
+            DownloadPluginMetadata downloadPluginMetadata = new DownloadPluginMetadata();
+            downloadPluginMetadata.setName(plugin.getName());
+            downloadPluginMetadataList.add(downloadPluginMetadata);
+        }
+
+        return downloadPluginMetadataList;
     }
 }

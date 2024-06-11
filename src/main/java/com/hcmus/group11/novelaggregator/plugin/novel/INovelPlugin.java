@@ -1,11 +1,8 @@
-package com.hcmus.group11.novelaggregator.plugin;
+package com.hcmus.group11.novelaggregator.plugin.novel;
 
-import com.hcmus.group11.novelaggregator.type.ChapterDetail;
-import com.hcmus.group11.novelaggregator.type.ChapterInfo;
-import com.hcmus.group11.novelaggregator.type.NovelDetail;
-import com.hcmus.group11.novelaggregator.type.NovelSearchResult;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.hcmus.group11.novelaggregator.type.*;
 
-import java.io.IOException;
 import java.util.List;
 
 public interface INovelPlugin {
@@ -29,10 +26,5 @@ public interface INovelPlugin {
 
     ChapterInfo getChapterInfoByNovelUrlAndChapterIndex(String novelUrl, String chapterIndex);
 
-    Object convertHtmlToPdf(String url) throws IOException;
-
-    Object convertHtmlToEpub(String url) throws IOException;
-
-    Object convertHtmlToImg(String url) throws Exception;
-
+    NovelDownloadInfo getNovelDownloadInfo(String url) throws JsonProcessingException;
 }

@@ -32,5 +32,12 @@ build/
 ### VS Code ###
 .vscode/
 
+### iron pdf
+IronPdfEngine.2024.5.2.Windows.x64/
+cef.log
+
 ### .class files ###
 *.class
+
+### properties files ###
+*.properties
