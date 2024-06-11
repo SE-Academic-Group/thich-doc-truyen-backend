@@ -103,7 +103,7 @@ public class PluginLoader<T> {
     private void handleWatchEvent(WatchEvent<?> event) {
         Path pluginPath = pluginsDir.resolve((Path) event.context());
         // Skip .class files
-        if (pluginPath.toString().endsWith(".class")) {
+        if (pluginPath.toString().endsWith(".class") || pluginPath.toString().endsWith(".class~")) {
             return;
         }
 
@@ -148,10 +148,11 @@ public class PluginLoader<T> {
                 try (URLClassLoader classLoader = new URLClassLoader(urls, getClass().getClassLoader())) {
                     String className = extractClassName(javaFile);
                     Class<?> clazz = classLoader.loadClass(packageName + "." + className);
+                    String beanName = getBeanName(className);
 
                     if (TClass.isAssignableFrom(clazz)) {
-                        unregisterBean(className);
-                        registerBean(className, clazz);
+                        unregisterBean(beanName);
+                        registerBean(beanName, clazz);
                         LOGGER.log(Level.INFO, "Loaded plugin: " + className);
                     } else {
                         LOGGER.log(Level.SEVERE, "Class does not implement the correct interface: " + javaFile.getName());
@@ -188,6 +189,10 @@ public class PluginLoader<T> {
     private String extractClassName(File file) {
         String fileName = file.getName();
         return fileName.substring(0, fileName.lastIndexOf('.'));
+    }
+
+    private String getBeanName(String className) {
+        return className.substring(0, 1).toLowerCase() + className.substring(1);
     }
 
     public Map<String, T> getPlugins() {
