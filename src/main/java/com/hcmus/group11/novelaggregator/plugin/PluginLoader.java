@@ -75,25 +75,29 @@ public class PluginLoader<T> {
         }
     }
 
-    private void watchPluginsDirectory() throws IOException {
-        WatchService watchService = FileSystems.getDefault().newWatchService();
-        pluginsDir.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
+    private void watchPluginsDirectory() {
+        try {
+            WatchService watchService = FileSystems.getDefault().newWatchService();
+            pluginsDir.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
 
-        Thread watchThread = new Thread(() -> {
-            try {
-                WatchKey key;
-                while ((key = watchService.take()) != null) {
-                    for (WatchEvent<?> event : key.pollEvents()) {
-                        handleWatchEvent(event);
+            Thread watchThread = new Thread(() -> {
+                try {
+                    WatchKey key;
+                    while ((key = watchService.take()) != null) {
+                        for (WatchEvent<?> event : key.pollEvents()) {
+                            handleWatchEvent(event);
+                        }
+                        key.reset();
                     }
-                    key.reset();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    LOGGER.log(Level.WARNING, "Watch thread interrupted", e);
                 }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                LOGGER.log(Level.WARNING, "Watch thread interrupted", e);
-            }
-        });
-        watchThread.start();
+            });
+            watchThread.start();
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Error watching plugin directory", e);
+        }
     }
 
     private void handleWatchEvent(WatchEvent<?> event) {
