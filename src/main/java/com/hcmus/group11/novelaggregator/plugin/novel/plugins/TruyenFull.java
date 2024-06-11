@@ -17,7 +17,7 @@ import java.util.concurrent.Executors;
 @Component
 public class TruyenFull extends BaseApi {
     public TruyenFull() {
-        this.pluginName = "truyenfull";
+        this.pluginName = "truyenFull";
         this.pluginUrl = "https://truyenfull.vn";
     }
 

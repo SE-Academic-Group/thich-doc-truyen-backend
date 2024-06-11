@@ -6,6 +6,8 @@ import com.hcmus.group11.novelaggregator.type.ChapterInfo;
 import com.hcmus.group11.novelaggregator.type.NovelDetail;
 import com.hcmus.group11.novelaggregator.type.NovelSearchResult;
 import com.hcmus.group11.novelaggregator.util.LevenshteinDistance;
+import lombok.Getter;
+import lombok.Setter;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 
@@ -13,17 +15,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+@Getter
+@Setter
 public abstract class BaseApi implements INovelPlugin {
     protected String pluginName;
     protected String pluginUrl;
-
-    public String getPluginName() {
-        return this.getClass().getSimpleName().toLowerCase();
-    }
-
-    public String getPluginUrl() {
-        return pluginUrl;
-    }
 
     @Override
     public ChapterDetail getChapterDetail(String url) {

@@ -15,7 +15,7 @@ import java.util.List;
 @Component
 public class ThichTruyen extends BaseCrawler {
     public ThichTruyen() {
-        pluginName = "thichtruyen";
+        pluginName = "thichTruyen";
         pluginUrl = "https://thichtruyen.vn";
     }
 

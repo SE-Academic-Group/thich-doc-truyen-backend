@@ -19,7 +19,7 @@ import java.util.concurrent.Executors;
 @Component
 public class TangThuVien extends BaseCrawler {
     public TangThuVien() {
-        pluginName = "tangthuvien";
+        pluginName = "tangThuVien";
         pluginUrl = "https://truyen.tangthuvien.vn";
     }
 

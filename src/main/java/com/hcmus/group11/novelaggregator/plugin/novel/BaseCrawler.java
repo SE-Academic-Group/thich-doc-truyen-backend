@@ -24,11 +24,6 @@ public abstract class BaseCrawler implements INovelPlugin {
     protected String pluginName;
     protected String pluginUrl;
 
-    @Override
-    public String getPluginName() {
-        return this.getClass().getSimpleName().toLowerCase();
-    }
-
     public List<NovelSearchResult> search(String keyword, Integer page) {
         String searchUrl = buildSearchUrl(keyword, page);
         Document html = getHtml(searchUrl);
