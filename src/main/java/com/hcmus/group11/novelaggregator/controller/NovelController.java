@@ -16,7 +16,6 @@ import java.util.List;
 @RestController
 @RequestMapping("")
 public class NovelController {
-
     private NovelService novelService;
 
     public NovelController(NovelService novelService) {

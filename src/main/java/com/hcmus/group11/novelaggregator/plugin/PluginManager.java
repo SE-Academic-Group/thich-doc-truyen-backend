@@ -18,12 +18,10 @@ import java.util.Map;
 public class PluginManager {
     private PluginLoader<INovelPlugin> pluginLoader;
     private PluginLoader<IDownloadPlugin> downloadPluginLoader;
-    private List<DownloadOptions> downloadOptionsList;
 
     public PluginManager(PluginLoader<INovelPlugin> pluginLoader, PluginLoader<IDownloadPlugin> downloadPluginLoader, List<DownloadOptions> downloadOptionsList) {
         this.pluginLoader = pluginLoader;
         this.downloadPluginLoader = downloadPluginLoader;
-        this.downloadOptionsList = downloadOptionsList;
     }
 
     public INovelPlugin getPlugin(String pluginName) {

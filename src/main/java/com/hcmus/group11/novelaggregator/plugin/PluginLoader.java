@@ -31,6 +31,7 @@ public class PluginLoader<T> {
     private final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 
     private final Map<String, Runnable> tasks = new ConcurrentHashMap<>();
+
     private Timer processDelayTimer = null;
     private static final long DELAY = 2000; // milliseconds
 
@@ -66,7 +67,7 @@ public class PluginLoader<T> {
             Files.list(pluginsDir).forEach(file -> {
                 String className = extractClassName(file.toFile());
                 if (file.toString().endsWith(".java")) {
-                    addTask(className, () -> loadT(file.toFile()));
+                    addTask(className, () -> loadT(className));
                 }
             });
             runAllTasks(); // Run tasks immediately to load existing plugins
@@ -85,9 +86,9 @@ public class PluginLoader<T> {
                     WatchKey key;
                     while ((key = watchService.take()) != null) {
                         for (WatchEvent<?> event : key.pollEvents()) {
+                            key.reset();
                             handleWatchEvent(event);
                         }
-                        key.reset();
                     }
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
@@ -103,17 +104,25 @@ public class PluginLoader<T> {
     private void handleWatchEvent(WatchEvent<?> event) {
         Path pluginPath = pluginsDir.resolve((Path) event.context());
         // Skip .class files
-        if (pluginPath.toString().endsWith(".class") || pluginPath.toString().endsWith(".class~")) {
-            return;
+        if (!pluginPath.toString().endsWith(".java")) {
+            return; // Ignore non-Java files and temporary files
         }
 
-        File pluginFile = pluginPath.toFile();
-        String className = extractClassName(pluginFile);
+        String className = pluginPath.toString().substring(pluginsDir.toString().length() + 1).replace(".java", "");
 
-        if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE || event.kind() == StandardWatchEventKinds.ENTRY_MODIFY) {
-            addTask(className, () -> loadT(pluginFile));
-        } else if (event.kind() == StandardWatchEventKinds.ENTRY_DELETE) {
-            addTask(className, () -> unloadT(pluginFile));
+        synchronized (tasks) {
+            if (tasks.containsKey(className.toLowerCase())) {
+                tasks.remove(className.toLowerCase());
+            }
+            if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE || event.kind() == StandardWatchEventKinds.ENTRY_MODIFY) {
+                addTask(className, () -> loadT(className));
+            } else if (event.kind() == StandardWatchEventKinds.ENTRY_DELETE) {
+//            if (pluginFile.toString().endsWith(".java~")) {
+//                return;
+//            }
+//            addTask(className, () -> unloadT(pluginFile));
+            }
+
         }
     }
 
@@ -127,36 +136,55 @@ public class PluginLoader<T> {
         processDelayTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                runAllTasks();
-                tasks.clear();
+                // Execute tasks in a synchronized block to prevent race conditions
+                synchronized (tasks) {
+                    runAllTasks();
+                    tasks.clear();
+                }
             }
-        }, DELAY);
+        }, PluginLoader.DELAY);
     }
 
     private void runAllTasks() {
         tasks.values().forEach(Runnable::run);
     }
 
-    public void loadT(File file) {
+    public void loadT(String className) {
         try {
-            File javaFile = new File(file.getPath().replace(".java~", ".java"));
+            // Ensure file content is fully written before compiling (Important!)
+            File javaFile = new File(pluginsDir + "/" + className + ".java");
+            while (javaFile.length() == 0 || !javaFile.canRead()) {
+                try {
+                    Thread.sleep(100); // Brief pause to allow for file writing
+                } catch (InterruptedException e) {
+                    LOGGER.log(Level.WARNING, "Thread interrupted while waiting for file: " + javaFile.getName(), e);
+                }
+            }
+
+            // Remove old .class file if it exists
+            File oldClassFile = new File(javaFile.getPath().replace(".java", ".class").replace("~", ""));
+            if (oldClassFile.exists()) {
+                oldClassFile.delete();
+            }
+
             int compileResult = compiler.run(null, null, null, javaFile.getPath(), "-d", "src/main/java", "-Xlint:-options");
 
             if (compileResult == 0) {
-                File compiledFile = new File(file.getPath().replace(".java", ".class"));
+                File compiledFile = new File(javaFile.getPath().replace(".java", ".class").replace("~", ""));
                 URL[] urls = new URL[]{compiledFile.toURI().toURL()};
                 try (URLClassLoader classLoader = new URLClassLoader(urls, getClass().getClassLoader())) {
-                    String className = extractClassName(javaFile);
-                    Class<?> clazz = classLoader.loadClass(packageName + "." + className);
-                    String beanName = getBeanName(className);
-
-                    if (TClass.isAssignableFrom(clazz)) {
-                        unregisterBean(beanName);
-                        registerBean(beanName, clazz);
-                        LOGGER.log(Level.INFO, "Loaded plugin: " + className);
-                    } else {
-                        LOGGER.log(Level.SEVERE, "Class does not implement the correct interface: " + javaFile.getName());
+                    compileAndLoad(javaFile, classLoader);
+                } catch (ClassNotFoundException e) {
+                    // Try to load the class again
+                    File newJavaFile = new File(pluginsDir + "/" + javaFile.getName());
+                    int compileResult2 = compiler.run(null, null, null, newJavaFile.getPath(), "-d", "src/main/java", "-Xlint:-options");
+                    URL[] urls2 = new URL[]{new File(newJavaFile.getPath().replace(".java", ".class").replace("~", "")).toURI().toURL()};
+                    try (URLClassLoader classLoader = new URLClassLoader(urls2, getClass().getClassLoader())) {
+                        compileAndLoad(newJavaFile, classLoader);
+                    } catch (ClassNotFoundException e2) {
+                        LOGGER.log(Level.SEVERE, "Error loading class", e);
                     }
+
                 }
             } else {
                 LOGGER.log(Level.SEVERE, "Failed to compile plugin: " + javaFile.getName());
@@ -166,16 +194,35 @@ public class PluginLoader<T> {
         }
     }
 
+    private void compileAndLoad(File newJavaFile, URLClassLoader classLoader) throws ClassNotFoundException {
+        String className = extractClassName(newJavaFile);
+        Class<?> clazz = classLoader.loadClass(packageName + "." + className);
+        String beanName = getBeanName(className);
+
+        if (TClass.isAssignableFrom(clazz)) {
+            unregisterBean(beanName);
+            registerBean(beanName, clazz);
+            LOGGER.log(Level.INFO, "Loaded plugin: " + className);
+        } else {
+            LOGGER.log(Level.SEVERE, "Class does not implement the correct interface: " + newJavaFile.getName());
+        }
+    }
+
     private void registerBean(String beanName, Class<?> beanClass) {
         BeanDefinitionRegistry beanFactory = (BeanDefinitionRegistry) applicationContext.getBeanFactory();
         BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(beanClass);
         BeanDefinition beanDefinition = builder.getRawBeanDefinition();
+
+        if (beanFactory.containsBeanDefinition(beanName)) {
+            beanFactory.removeBeanDefinition(beanName);
+        }
         beanFactory.registerBeanDefinition(beanName, beanDefinition);
     }
 
     public void unloadT(File file) {
         String className = extractClassName(file);
-        unregisterBean(className);
+        String beanName = getBeanName(className);
+        unregisterBean(beanName);
         LOGGER.log(Level.INFO, "Unloaded plugin: " + className);
     }
 
