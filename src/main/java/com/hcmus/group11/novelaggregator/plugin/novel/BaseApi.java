@@ -60,6 +60,7 @@ public abstract class BaseApi implements INovelPlugin {
     @Override
     public List<NovelSearchResult> search(String keyword, Integer page) {
         String searchUrl = buildSearchUrl(keyword, page);
+        System.out.println("searchUrl: " + searchUrl);
         String jsonString = getJsonString(searchUrl);
         List<NovelSearchResult> novelSearchResults = getSearchDataFromJsonString(jsonString);
         if (novelSearchResults == null || novelSearchResults.isEmpty()) {
