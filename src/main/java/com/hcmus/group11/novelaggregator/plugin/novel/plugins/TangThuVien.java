@@ -7,6 +7,7 @@ import com.hcmus.group11.novelaggregator.util.RequestAttributeUtil;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.stereotype.Component;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+@Component
 public class TangThuVien extends BaseCrawler {
     public TangThuVien() {
         pluginName = "tangThuVien";

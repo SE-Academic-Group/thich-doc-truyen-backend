@@ -1,5 +1,6 @@
 package com.hcmus.group11.novelaggregator.plugin;
 
+import com.hcmus.group11.novelaggregator.util.CustomClassLoader;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -8,10 +9,11 @@ import org.springframework.stereotype.Component;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.file.*;
 import java.util.Map;
 import java.util.Timer;
@@ -26,14 +28,14 @@ public class PluginLoader<T> {
 
     private final Class<T> TClass;
     private final ConfigurableApplicationContext applicationContext;
-    private String packageName;
+    private final String packageName;
     private final Path pluginsDir;
     private final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 
     private final Map<String, Runnable> tasks = new ConcurrentHashMap<>();
 
     private Timer processDelayTimer = null;
-    private static final long DELAY = 2000; // milliseconds
+    private static final long DELAY = 1000; // milliseconds
 
     public PluginLoader(String packageName, Class<T> TClass, ConfigurableApplicationContext applicationContext) throws IOException {
         this.packageName = packageName;
@@ -42,7 +44,7 @@ public class PluginLoader<T> {
         pluginsDir = Paths.get("src/main/java/" + packageName.replace(".", "/"));
 
         clearPlugindirectory();
-        loadExistingPlugins();
+//        loadExistingPlugins();
         watchPluginsDirectory();
     }
 
@@ -83,12 +85,12 @@ public class PluginLoader<T> {
 
             Thread watchThread = new Thread(() -> {
                 try {
-                    WatchKey key;
-                    while ((key = watchService.take()) != null) {
+                    while (true) {
+                        WatchKey key = watchService.take(); // this will return the keys
                         for (WatchEvent<?> event : key.pollEvents()) {
-                            key.reset();
                             handleWatchEvent(event);
                         }
+                        key.reset();
                     }
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
@@ -107,23 +109,14 @@ public class PluginLoader<T> {
         if (!pluginPath.toString().endsWith(".java")) {
             return; // Ignore non-Java files and temporary files
         }
-
         String className = pluginPath.toString().substring(pluginsDir.toString().length() + 1).replace(".java", "");
 
-        synchronized (tasks) {
-            if (tasks.containsKey(className.toLowerCase())) {
-                tasks.remove(className.toLowerCase());
-            }
-            if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE || event.kind() == StandardWatchEventKinds.ENTRY_MODIFY) {
-                addTask(className, () -> loadT(className));
-            } else if (event.kind() == StandardWatchEventKinds.ENTRY_DELETE) {
-//            if (pluginFile.toString().endsWith(".java~")) {
-//                return;
-//            }
-//            addTask(className, () -> unloadT(pluginFile));
-            }
-
+        if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE || event.kind() == StandardWatchEventKinds.ENTRY_MODIFY) {
+            addTask(className, () -> loadT(className));
+        } else if (event.kind() == StandardWatchEventKinds.ENTRY_DELETE) {
+            addTask(className, () -> unloadT(pluginPath.toFile()));
         }
+
     }
 
     private void addTask(String className, Runnable task) {
@@ -136,11 +129,8 @@ public class PluginLoader<T> {
         processDelayTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                // Execute tasks in a synchronized block to prevent race conditions
-                synchronized (tasks) {
-                    runAllTasks();
-                    tasks.clear();
-                }
+                runAllTasks();
+                tasks.clear();
             }
         }, PluginLoader.DELAY);
     }
@@ -167,44 +157,28 @@ public class PluginLoader<T> {
                 oldClassFile.delete();
             }
 
+            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
             int compileResult = compiler.run(null, null, null, javaFile.getPath(), "-d", "src/main/java", "-Xlint:-options");
 
             if (compileResult == 0) {
-                File compiledFile = new File(javaFile.getPath().replace(".java", ".class").replace("~", ""));
+                File compiledFile = new File(javaFile.getAbsolutePath().replace(".java", ".class"));
                 URL[] urls = new URL[]{compiledFile.toURI().toURL()};
-                try (URLClassLoader classLoader = new URLClassLoader(urls, getClass().getClassLoader())) {
-                    compileAndLoad(javaFile, classLoader);
-                } catch (ClassNotFoundException e) {
-                    // Try to load the class again
-                    File newJavaFile = new File(pluginsDir + "/" + javaFile.getName());
-                    int compileResult2 = compiler.run(null, null, null, newJavaFile.getPath(), "-d", "src/main/java", "-Xlint:-options");
-                    URL[] urls2 = new URL[]{new File(newJavaFile.getPath().replace(".java", ".class").replace("~", "")).toURI().toURL()};
-                    try (URLClassLoader classLoader = new URLClassLoader(urls2, getClass().getClassLoader())) {
-                        compileAndLoad(newJavaFile, classLoader);
-                    } catch (ClassNotFoundException e2) {
-                        LOGGER.log(Level.SEVERE, "Error loading class", e);
-                    }
+                // Sleep for a while to allow the file to be fully written
+                Thread.sleep(DELAY * 2);
 
+                Class<T> clazz = loadClass(compiledFile.getAbsolutePath());
+                if (clazz != null) {
+                    String beanName = getBeanName(className);
+                    unregisterBean(beanName);
+                    registerBean(beanName, clazz);
+                    LOGGER.log(Level.INFO, "Loaded plugin: " + className);
                 }
+
             } else {
                 LOGGER.log(Level.SEVERE, "Failed to compile plugin: " + javaFile.getName());
             }
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error loading plugin", e);
-        }
-    }
-
-    private void compileAndLoad(File newJavaFile, URLClassLoader classLoader) throws ClassNotFoundException {
-        String className = extractClassName(newJavaFile);
-        Class<?> clazz = classLoader.loadClass(packageName + "." + className);
-        String beanName = getBeanName(className);
-
-        if (TClass.isAssignableFrom(clazz)) {
-            unregisterBean(beanName);
-            registerBean(beanName, clazz);
-            LOGGER.log(Level.INFO, "Loaded plugin: " + className);
-        } else {
-            LOGGER.log(Level.SEVERE, "Class does not implement the correct interface: " + newJavaFile.getName());
         }
     }
 
@@ -244,5 +218,40 @@ public class PluginLoader<T> {
 
     public Map<String, T> getPlugins() {
         return applicationContext.getBeansOfType(TClass);
+    }
+
+    Class<T> loadClass(String pathToClassFile) {
+        //Declare the process builder to execute class file at run time (Provided filepath to class)
+        ProcessBuilder pb = new ProcessBuilder("javap", pathToClassFile);
+        try {
+            //Start the process builder
+            Process p = pb.start();
+
+            //Declare string to hold class name
+            String classname = null;
+            //Declare buffer reader to read the class file & get class name
+            BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            String line;
+            while (null != (line = br.readLine())) {
+                if (line.startsWith("public class")) {
+                    classname = line.split(" ")[2];
+                    break;
+                }
+            }
+
+            byte[] classData = Files.readAllBytes(Paths.get(pathToClassFile));
+            CustomClassLoader classLoader = new CustomClassLoader(classData);
+            Class<?> clazz = classLoader.findClass(classname);
+
+            return (Class<T>) clazz;
+        } catch (Exception e) {
+            if (e instanceof ClassNotFoundException) {
+                System.out.println("Class not found: " + e.getMessage());
+            } else {
+                System.out.println("Error: " + e.getMessage());
+            }
+            e.printStackTrace();
+            return null;
+        }
     }
 }
