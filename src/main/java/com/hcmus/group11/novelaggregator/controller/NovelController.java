@@ -9,8 +9,6 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import jakarta.validation.constraints.Min;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,7 +16,6 @@ import java.util.List;
 @RestController
 @RequestMapping("")
 public class NovelController {
-
     private NovelService novelService;
 
     public NovelController(NovelService novelService) {
@@ -34,13 +31,13 @@ public class NovelController {
             responses = {
                     @ApiResponse(description = "List of novels matching the search criteria",
                             responseCode = "200",
-                            content = @Content(mediaType = "Json", array = @ArraySchema(schema = @Schema(implementation = NovelSearchResult.class)))),
+                            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = NovelSearchResult.class)))),
                     @ApiResponse(responseCode = "400", description = "Invalid input",
-                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class))),
                     @ApiResponse(responseCode = "404", description = "Not Found",
-                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class))),
                     @ApiResponse(responseCode = "500", description = "Internal Server Error",
-                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class)))
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class)))
             }
     )
     @GetMapping("/{pluginName}/search")
@@ -58,13 +55,13 @@ public class NovelController {
             responses = {
                     @ApiResponse(description = "Details of the novel",
                             responseCode = "200",
-                            content = @Content(mediaType = "Json", schema = @Schema(implementation = NovelDetail.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = NovelDetail.class))),
                     @ApiResponse(responseCode = "400", description = "Invalid URL",
-                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class))),
                     @ApiResponse(responseCode = "404", description = "Not Found",
-                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class))),
                     @ApiResponse(responseCode = "500", description = "Internal Server Error",
-                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class)))
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class)))
             }
     )
     @GetMapping("/novel-detail")
@@ -80,13 +77,13 @@ public class NovelController {
             responses = {
                     @ApiResponse(description = "List of chapters",
                             responseCode = "200",
-                            content = @Content(mediaType = "Json", array = @ArraySchema(schema = @Schema(implementation = ChapterInfo.class)))),
+                            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ChapterInfo.class)))),
                     @ApiResponse(responseCode = "400", description = "Invalid URL or page number",
-                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class))),
                     @ApiResponse(responseCode = "404", description = "Not Found",
-                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class))),
                     @ApiResponse(responseCode = "500", description = "Internal Server Error",
-                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class)))
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class)))
             }
     )
     @GetMapping("/chapter-list")
@@ -101,9 +98,9 @@ public class NovelController {
             responses = {
                     @ApiResponse(description = "List of available plugins",
                             responseCode = "200",
-                            content = @Content(mediaType = "Json", array = @ArraySchema(schema = @Schema(implementation = PluginMetadata.class)))),
+                            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = PluginMetadata.class)))),
                     @ApiResponse(responseCode = "500", description = "Internal Server Error",
-                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class)))
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class)))
             }
     )
     @GetMapping("/plugin-list")
@@ -119,13 +116,13 @@ public class NovelController {
             responses = {
                     @ApiResponse(description = "Details of the chapter",
                             responseCode = "200",
-                            content = @Content(mediaType = "Json", schema = @Schema(implementation = ChapterDetail.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChapterDetail.class))),
                     @ApiResponse(responseCode = "400", description = "Invalid URL",
-                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class))),
                     @ApiResponse(responseCode = "404", description = "Not Found",
-                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class))),
                     @ApiResponse(responseCode = "500", description = "Internal Server Error",
-                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class)))
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class)))
             }
     )
     @GetMapping("/chapter-detail")
@@ -140,13 +137,13 @@ public class NovelController {
             responses = {
                     @ApiResponse(description = "List of all chapters",
                             responseCode = "200",
-                            content = @Content(mediaType = "Json", array = @ArraySchema(schema = @Schema(implementation = ChapterInfo.class)))),
+                            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ChapterInfo.class)))),
                     @ApiResponse(responseCode = "400", description = "Invalid URL",
-                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class))),
                     @ApiResponse(responseCode = "404", description = "Not Found",
-                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class))),
                     @ApiResponse(responseCode = "500", description = "Internal Server Error",
-                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class)))
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class)))
             }
     )
     @GetMapping("/full-chapter-list")
@@ -162,13 +159,13 @@ public class NovelController {
             responses = {
                     @ApiResponse(description = "Chapter Information of each plugin",
                             responseCode = "200",
-                            content = @Content(mediaType = "Json", array = @ArraySchema(schema = @Schema(implementation = ChapterInfo.class)))),
+                            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ChapterInfo.class)))),
                     @ApiResponse(responseCode = "400", description = "Invalid URL",
-                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class))),
                     @ApiResponse(responseCode = "404", description = "Not Found",
-                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class))),
                     @ApiResponse(responseCode = "500", description = "Internal Server Error",
-                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class)))
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class)))
             }
     )
     @GetMapping("/switch-plugin")
@@ -176,77 +173,39 @@ public class NovelController {
         return novelService.getSwitchPluginMetaData(chapterIndex, novelUrl);
     }
 
-    @Operation(summary = "Convert HTML to EPUB",
-            parameters = {
-                    @Parameter(name = "url", description = "URL of the HTML", required = true, example = "http://example.com/novel")
-            },
-            responses = {
-                    @ApiResponse(description = "EPUB file", responseCode = "200", content = @Content(mediaType = "application/epub+zip")),
-                    @ApiResponse(responseCode = "400", description = "Invalid URL",
-                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class))),
-                    @ApiResponse(responseCode = "404", description = "Not Found",
-                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class))),
-                    @ApiResponse(responseCode = "500", description = "Internal Server Error",
-                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class)))
-            }
-    )
-    @GetMapping( "${download.paths.EPUB}")
-    public Object convertHtmlToEpub(@RequestParam() String url) throws Exception {
-        return novelService.convertHtmlToEpub(url);
-    }
-
-    @Operation(summary = "Convert HTML to PDF",
-            parameters = {
-                    @Parameter(name = "url", description = "URL of the HTML", required = true, example = "http://example.com/novel")
-            },
-            responses = {
-                    @ApiResponse(description = "PDF file", responseCode = "200", content = @Content(mediaType = "application/pdf")),
-                    @ApiResponse(responseCode = "400", description = "Invalid URL",
-                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class))),
-                    @ApiResponse(responseCode = "404", description = "Not Found",
-                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class))),
-                    @ApiResponse(responseCode = "500", description = "Internal Server Error",
-                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class)))
-            }
-    )
-    @GetMapping( "${download.paths.PDF}")
-    public Object convertHtmlToPdf(@RequestParam() String url) throws Exception {
-        return novelService.convertHtmlToPdf(url);
-    }
-
-    @Operation(summary = "Convert HTML to Image",
-            parameters = {
-                    @Parameter(name = "url", description = "URL of the HTML", required = true, example = "http://example.com/novel")
-            },
-            responses = {
-                    @ApiResponse(description = "Image file", responseCode = "200", content = @Content(mediaType = "image/png")),
-                    @ApiResponse(responseCode = "400", description = "Invalid URL",
-                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class))),
-                    @ApiResponse(responseCode = "404", description = "Not Found",
-                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class))),
-                    @ApiResponse(responseCode = "500", description = "Internal Server Error",
-                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class)))
-            }
-    )
-    @GetMapping("${download.paths.IMAGES}")
-    public Object convertHtmlToImg(@RequestParam() String url) throws Exception {
-        return novelService.convertHtmlToImg(url);
-    }
-
     @Operation(summary = "Get download options",
             responses = {
                     @ApiResponse(description = "list chapter download options",
                             responseCode = "200",
-                            content = @Content(mediaType = "Json", array = @ArraySchema(schema = @Schema(implementation = DownloadOptions.class)))),
+                            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = DownloadOptions.class)))),
                     @ApiResponse(responseCode = "400", description = "No endpoint found for the request",
-                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class))),
                     @ApiResponse(responseCode = "500", description = "Internal Server Error",
-                            content = @Content(mediaType = "Json", schema = @Schema(implementation = TransformedHttpException.class)))
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class)))
             }
     )
     @GetMapping("/download-options")
-    public List<DownloadOptions> getDownloadOptions() {
+    public List<DownloadPluginMetadata> getDownloadOptions() {
         return novelService.getDownloadOptionsList();
     }
 
+    @Operation(summary = "Download novel",
+            parameters = {
+                    @Parameter(name = "url", description = "URL of the novel", required = true, example = "http://example.com/novel"),
+                    @Parameter(name = "type", description = "Type of download", required = true, example = "epub")
+            },
+            responses = {
+                    @ApiResponse(description = "Downloaded file",
+                            responseCode = "200",
+                            content = @Content(mediaType = "application/octet-stream")),
+                    @ApiResponse(responseCode = "400", description = "Invalid URL or type",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class))),
+                    @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransformedHttpException.class)))
+            }
+    )
+    @GetMapping("/download")
+    public Object downloadNovel(@RequestParam() String url, @RequestParam() String type) throws Exception {
+        return novelService.exportNovel(url, type);
+    }
 }

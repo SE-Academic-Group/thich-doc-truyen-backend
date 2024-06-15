@@ -1,12 +1,13 @@
-package com.hcmus.group11.novelaggregator.plugin;
+package com.hcmus.group11.novelaggregator.plugin.novel;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hcmus.group11.novelaggregator.exception.type.HttpException;
 import com.hcmus.group11.novelaggregator.type.ChapterDetail;
 import com.hcmus.group11.novelaggregator.type.ChapterInfo;
 import com.hcmus.group11.novelaggregator.type.NovelDetail;
 import com.hcmus.group11.novelaggregator.type.NovelSearchResult;
 import com.hcmus.group11.novelaggregator.util.LevenshteinDistance;
+import lombok.Getter;
+import lombok.Setter;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 
@@ -14,17 +15,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+@Getter
+@Setter
 public abstract class BaseApi implements INovelPlugin {
     protected String pluginName;
     protected String pluginUrl;
-
-    public String getPluginName() {
-        return pluginName;
-    }
-
-    public String getPluginUrl() {
-        return pluginUrl;
-    }
 
     @Override
     public ChapterDetail getChapterDetail(String url) {
@@ -65,6 +60,7 @@ public abstract class BaseApi implements INovelPlugin {
     @Override
     public List<NovelSearchResult> search(String keyword, Integer page) {
         String searchUrl = buildSearchUrl(keyword, page);
+        System.out.println("searchUrl: " + searchUrl);
         String jsonString = getJsonString(searchUrl);
         List<NovelSearchResult> novelSearchResults = getSearchDataFromJsonString(jsonString);
         if (novelSearchResults == null || novelSearchResults.isEmpty()) {
@@ -135,20 +131,6 @@ public abstract class BaseApi implements INovelPlugin {
         return result;
     }
 
-    public Object convertHtmlToEpub(String url) throws JsonProcessingException {
-        String jsonDetailString = getJsonString(url);
-        return convertToEpub(jsonDetailString);
-    }
-    public Object convertHtmlToPdf(String url) {
-        String jsonDetailString = getJsonString(url);
-        return convertToPdf(jsonDetailString);
-    }
-    public Object convertHtmlToImg(String url) {
-        String jsonDetailString = getJsonString(url);
-        return convertToImg(jsonDetailString);
-    }
-
-
     protected abstract ChapterDetail getChapterDetailFromJsonString(String jsonChapterDetail);
 
     protected abstract List<ChapterInfo> getChapterListFromJsonString(String jsonChapterList);
@@ -166,14 +148,4 @@ public abstract class BaseApi implements INovelPlugin {
     protected abstract String buildChapterDetailUrl(Integer chapterId);
 
     protected abstract void addMetaData(Map<String, Optional> map);
-
-    protected List<NovelSearchResult> filterSearchResults(List<NovelSearchResult> novelSearchResults, String keyword) {
-        return novelSearchResults;
-    }
-
-    protected abstract Object convertToEpub(String jsonString) throws JsonProcessingException;
-
-    protected abstract Object convertToPdf(String jsonString);
-
-    protected abstract Object convertToImg(String jsonString);
 }
