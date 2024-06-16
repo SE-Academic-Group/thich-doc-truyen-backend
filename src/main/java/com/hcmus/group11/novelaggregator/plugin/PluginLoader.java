@@ -44,7 +44,7 @@ public class PluginLoader<T> {
         pluginsDir = Paths.get("src/main/java/" + packageName.replace(".", "/"));
 
         clearPlugindirectory();
-//        loadExistingPlugins();
+        loadExistingPlugins();
         watchPluginsDirectory();
     }
 
