@@ -18,6 +18,25 @@ jobs:
           distribution: 'corretto'
           java-version: 17
 
+      - name: Create application.properties
+        run: |
+          mkdir -p src/main/resources
+          echo "spring.application.name=Novel Aggregator" >> src/main/resources/application.properties
+          echo "server.port=8080" >> src/main/resources/application.properties
+          echo "spring.main.banner-mode=off" >> src/main/resources/application.properties
+          echo "management.endpoints.web.exposure.include=health,info,beans" >> src/main/resources/application.properties
+          echo "springdoc.swagger-ui.enabled=true" >> src/main/resources/application.properties
+          echo "download.types=PDF,EPUB,IMAGES" >> src/main/resources/application.properties
+          echo "download.paths.PDF=/htmlToPdf" >> src/main/resources/application.properties
+          echo "download.paths.EPUB=/htmlToEpub" >> src/main/resources/application.properties
+          echo "download.paths.IMAGES=/htmlToImg" >> src/main/resources/application.properties
+          echo "download.descriptions.PDF=Download PDF" >> src/main/resources/application.properties
+          echo "download.descriptions.EPUB=Download EPUB" >> src/main/resources/application.properties
+          echo "download.descriptions.IMAGES=Download IMAGES" >> src/main/resources/application.properties
+          echo "ironpdf.license-key=${{ secrets.IRONPDF_LICENSE_KEY }}" >> src/main/resources/application.properties
+          echo "plugins.package.name.novel-plugins=com.hcmus.group11.novelaggregator.plugin.novel.plugins" >> src/main/resources/application.properties
+          echo "plugins.package.name.download-plugins=com.hcmus.group11.novelaggregator.plugin.download.plugins" >> src/main/resources/application.properties
+
       - name: build the app
         run: |
           mvn clean
